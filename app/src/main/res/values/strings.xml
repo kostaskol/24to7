@@ -1,0 +1,59 @@
+<resources>
+    <!-- General -->
+    <string name="app_name">24/7</string>
+    <string name="title_activity_lat_long">latLong</string>
+    <string name='OK'>OK</string>
+    <!--
+    <string name='lat_msg'>Latitude</string>
+    <string name='long_msg'>Longitude</string>
+    <string name='GPSBtn'>Show location</string>
+    -->
+    <string name="title_activity_panic">panic</string>
+    <string name="title_activity_lat_long_drawer">24/7 Trucks</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title_activity_gpstrack">Map</string>
+    <!-- Navigation Bar -->
+    <string name="credits">Credits</string>
+    <string name="quit">Έξοδος</string>
+    <!-- Splash screen -->
+    <string name="rotatingImg">Rotating Image</string>
+    <string name="base">Inner Image</string>
+    <!-- Lat Long screen -->
+    <string name="tick_sign">tick</string>
+    <string name="app_icon">Main Application icon</string>
+    <string name="split">Splitter</string>
+    <string name='log_msg'>Συνδεθείτε για να συνεχίσετε</string>
+    <string name='usr_msg'>Όνομα Χρήστη</string>
+    <string name='pwd_msg'>Κωδικός</string>
+    <string name='logged_msg'>Συνδεδεμένος</string>
+    <!-- Message Bars -->
+    <string name="no_internet_bar">Δεν υπάρχει σύνδεση στο internet</string>
+    <string name="no_gps_bar">Δεν βρέθηκε σήμα GPS</string>
+    <!-- Login screen -->
+    <string name="pass_icon">Password icon</string>
+    <string name="user_icon">Username Icon</string>
+    <string name="btl">Back to login</string>
+    <string name="moveToPass">Continue to input password</string>
+    <!-- nav_head -->
+    <string name="header_small">24/7</string>
+    <string name="header_large">mapgr.eu</string>
+    <!-- Settings -->
+    <string name="timeSettings">Χρόνος Αποστολής Σήματος GPS.</string>
+    <string name="settings">Ρυθμίσεις</string>
+
+
+    <!-- Java -->
+    <string name="wrong_cred">Το όνομα χρήστη ή ο κωδικός είναι λάθος. Παρακαλώ προσπαθήστε ξανά.</string>
+    <string name="unkown_error">Ένα άγνωστο σφάλμα προέκυψε. Προσπαθήστε ξανά.</string>
+    <string name="no_internet_connection">Σφάλμα. Σιγουρευτείτε πως έχετε σύνδεση στο Internet και προσπαθήστε ξανά.</string>
+    <string name="title_activity_credits">credits</string>
+    <string name="title_activity_settings">Settings</string>
+
+
+    <!-- Google Api Key -->
+    <string name="google_maps_key">AIzaSyDLO2PWlj8LX8tjyM4zPgbqycC8OQMSw6s</string>
+    <string name="title_activity_instant_messaging">InstantMessaging</string>
+    <string name="action_settings">Settings</string>
+
+</resources>

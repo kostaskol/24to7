@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="gr.mapeu.a24to7_rebuild.LoginScreen"
+    tools:showIn="@layout/activity_login_screen">
+
+
+    <ImageButton
+        android:contentDescription="@string/app_icon"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@drawable/iconlogin"
+        android:id="@+id/link"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:contentDescription="@string/split"
+        android:layout_width="match_parent"
+        android:layout_height="7dp"
+        android:background="@color/colorPrimary"
+        android:id="@+id/splitter"
+        android:layout_marginTop="200dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"/>
+
+
+    <ProgressBar android:indeterminate="true"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:id="@+id/loading"
+        style="?android:attr/progressBarStyle"
+        android:visibility="invisible"
+        android:layout_below="@+id/moveToPass"
+        android:layout_centerHorizontal="true" />
+
+    <ImageButton
+        android:contentDescription="@string/moveToPass"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:id="@+id/moveToPass"
+        android:background="@drawable/circlearrowright"
+        android:layout_alignTop="@+id/returnToUser"
+        android:layout_alignStart="@+id/loading"
+        android:layout_alignLeft="@id/loading"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/passWord"
+        android:layout_below="@+id/splitter"
+        android:layout_marginTop="30dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true">
+        <ImageView
+            android:contentDescription="@string/pass_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_weight="0.1"
+            android:background="@drawable/pass"/>
+        <EditText
+            android:id='@+id/log_pwd'
+            android:inputType='textPassword'
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_weight="10"
+            android:hint='@string/pwd_msg'
+            android:background="#fff" />
+        <Button
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.1"
+            android:id="@+id/hidePassKeyboard"
+            android:text="@string/OK"
+            android:textColor="#fff"
+            android:background="#000"
+            android:visibility="gone"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/userName"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/splitter"
+        android:layout_gravity="center"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true" >
+        <ImageView
+            android:contentDescription="@string/user_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_weight="0.1"
+            android:background="@drawable/user"/>
+
+        <EditText
+            android:id='@+id/log_user'
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="10"
+            android:hint='@string/usr_msg'
+            android:background="#fff" />
+        <Button
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.1"
+            android:id="@+id/hideUserKeyboard"
+            android:text="@string/OK"
+            android:textColor="#fff"
+            android:background="#000"
+            android:visibility="invisible"/>
+
+    </LinearLayout>
+
+    <ImageButton
+        android:contentDescription="@string/log_msg"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:id="@+id/logIn"
+        android:background="@drawable/circlearrowright"
+        android:layout_alignTop="@+id/moveToPass"
+        android:layout_alignEnd="@+id/link"
+        android:layout_alignRight="@id/link" />
+
+    <ImageButton
+        android:contentDescription="@string/btl"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:id="@+id/returnToUser"
+        android:background="@drawable/clickarrowleft"
+        android:layout_marginTop="24dp"
+        android:layout_below="@+id/passWord"
+        android:layout_alignStart="@+id/link"
+        android:layout_alignLeft="@id/link"/>
+
+
+</RelativeLayout>
