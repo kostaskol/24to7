@@ -5,15 +5,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,36 +22,51 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import static android.content.Context.MODE_PRIVATE;
-
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    public static Context mContext;
+    private final ScheduledExecutorService schedulerSend = Executors.newScheduledThreadPool(1);
+    // Gps Location Manager
+    GpsManager gps;
+    //WakeLock Variables
+    PowerManager mPowerManager;
+    PowerManager.WakeLock mWakeLock;
+    //Settings Preferences Variables
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 //TODO! create disconnect()
+//Data Variables
     private String[] location = new String[2];
     private String[] credentials = new String[2];
     private String key;
-    GpsManager gps;
-
+    //Thread Variables
     private ScheduledFuture cancelSend;
-    private final ScheduledExecutorService schedulerSend = Executors.newScheduledThreadPool(1);
     private Runnable sendData;
 
-    PowerManager mPowerManager;
-    PowerManager.WakeLock mWakeLock;
+    //Retrieves the error code and acts according to it
+    public static void errorRetriever(int code) {
+        if (code == Constants.ERROR_RELOG) {
 
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
+            logOut();
+        } else if (code == Constants.ERROR_UNKNOWN) {
+            Toast.makeText(MainActivity.mContext, "Υπήρξε πρόβλημα στην αποστολή δεδομένων " +
+                    "(έχετε ενεργή σύνδεση στο internet;", Toast.LENGTH_LONG).show();
+        }
+    }
 
-    public static Context mContext;
+    //TODO! create logOut functionality
+    public static void logOut() {
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //Initialize UI connections
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = this;
@@ -63,25 +77,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // Initialize function call
         initialize();
     }
 
     @Override
     public void onStart(){
         super.onStart();
+        // Thread Start Execution
         cancelSend = schedulerSend.scheduleAtFixedRate(sendData,gps.getInterval(),gps.getInterval(), TimeUnit.SECONDS);
     }
 
+    // initialize functions for initialization of data and thread variables
     public void initialize() {
         sharedPreferences = getSharedPreferences(Constants.MYPREFS, MODE_PRIVATE);
         editor = sharedPreferences.edit();
         editor.apply();
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = mWakeLock.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My tag");
+        mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My tag");
 
         //Get credentials from prefs
         credentials[0] = LoginScreen.sharedPreferences.getString(Constants.USER, null);
@@ -105,23 +121,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
     }
 
-
-    public static void errorRetriever(int code){
-        if (code == Constants.ERROR_RELOG){
-
-            logOut();
-        }
-        else if(code == Constants.ERROR_UNKNOWN){
-            Toast.makeText(MainActivity.mContext, "Υπήρξε πρόβλημα στην αποστολή δεδομένων " +
-                    "(έχετε ενεργή σύνδεση στο internet;", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public static void logOut(){
-
-    }
-
-    //Google stuff
+    //Google Drawer ovveride variables for Drawer functionality
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -171,6 +171,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+
+    // Checks for Network status
     private  void checkForNetwork() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo active = connectivityManager.getActiveNetworkInfo();
@@ -181,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    //Shows Bar if Network off
     protected  void showProblemBar(int ID) {
         LinearLayout internet = (LinearLayout) findViewById(ID);
         if (internet.getVisibility() == View.GONE) {
@@ -190,6 +193,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    //Hides Bar for Network enabled
     protected void hideProblemBar(int ID) {
         LinearLayout internet = (LinearLayout) findViewById(ID);
         if (internet.getVisibility() == View.VISIBLE) {
