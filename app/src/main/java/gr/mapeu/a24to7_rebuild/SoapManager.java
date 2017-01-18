@@ -2,6 +2,7 @@ package gr.mapeu.a24to7_rebuild;
 
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
@@ -13,18 +14,21 @@ public class SoapManager {
     private String[] credentials;
     private  String[] position;
     private String[] key;
+    LoginCallback callback;
 
-    SoapManager(String[] cred, double[] pos, String key) {
+    SoapManager(String[] cred, double[] pos, String key, LoginCallback callback) {
         this.credentials = cred;
         this.position = new String[2];
         this.position[0] = String.valueOf(pos[0]);
         this.position[1] = String.valueOf(pos[1]);
         this.key = new String[1];
         this.key[0] = key;
+        this.callback = callback;
     }
 
-    SoapManager(String[] cred) {
+    SoapManager(String[] cred, LoginCallback callback) {
         this.credentials = cred;
+        this.callback = callback;
     }
 
     void loginService() {
@@ -55,13 +59,13 @@ public class SoapManager {
                     String returnCode = response.getPropertyAsString("returnCode");
                     String key = response.getPropertyAsString("pKey");
                     if (returnCode.equals(Constants.CODE_WRONG_CRED)) {
-                        LoginScreen.logIn(Constants.ERROR_WRONG_CRED, null);
+                        callback.loginHandler(Constants.ERROR_WRONG_CRED, null);
                     } else {
-                        LoginScreen.logIn(Constants.ERROR_NO_ERROR, key);
+                        callback.loginHandler(Constants.ERROR_NO_ERROR, key);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    LoginScreen.logIn(Constants.ERROR_UNKNOWN, null);
+                    callback.loginHandler(Constants.ERROR_UNKNOWN, null);
                 }
                 return null;
             }
@@ -81,6 +85,7 @@ public class SoapManager {
                 cred = params[0];
                 pos = params[1];
                 key = params[2];
+                Log.d("SOAP", "Sending Data: " + cred[0] + ", " + cred[1]);
 
                 String response;
                 int code;
@@ -102,14 +107,15 @@ public class SoapManager {
 
                     SoapPrimitive soapResponse = (SoapPrimitive) envelope.getResponse();
                     response = soapResponse.toString();
+                    Log.d("RESPONSE", "Got response " + response);
                     if (response.equals(Constants.RE_LOGIN_CODE)) {
-                        MainActivity.errorRetriever(Constants.ERROR_RELOG);
+                        callback.logoutHandler(Constants.ERROR_RELOG);
                     } else {
-                        MainActivity.errorRetriever(Constants.ERROR_NO_ERROR);
+                        callback.logoutHandler(Constants.ERROR_NO_ERROR);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    MainActivity.errorRetriever(Constants.ERROR_UNKNOWN);
+                    callback.logoutHandler(Constants.ERROR_UNKNOWN);
                 }
                 return null;
             }

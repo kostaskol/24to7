@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GravityCompat;
@@ -15,6 +16,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,7 +33,9 @@ import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener,
+                    LoginCallback {
 
 //TODO! create disconnect()
     private String[] location = new String[2];
@@ -49,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
+    private boolean stopSendingData = false;
+
     public static Context mContext;
 
     @Override
@@ -56,8 +62,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = this;
-        Toolbar toolbar = (Toolbar) findViewById(R.id.lat_tb);
-        setSupportActionBar(toolbar);
+        /*Toolbar toolbar = (Toolbar) findViewById(R.id.lat_tb);
+        //setSupportActionBar(toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -65,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(this);*/
 
         initialize();
     }
@@ -81,40 +87,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         editor = sharedPreferences.edit();
         editor.apply();
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = mWakeLock.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My tag");
-
+        mWakeLock = mPowerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "myWakeLock");
+        mWakeLock.acquire();
         //Get credentials from prefs
         credentials[0] = LoginScreen.sharedPreferences.getString(Constants.USER, null);
         credentials[1] = LoginScreen.sharedPreferences.getString(Constants.PASS, null);
 
-        int interval = sharedPreferences.getInt(Constants.INTERVAL, 60);
-        if (!(interval > 0)) {
-            interval = 30;
-        }
+        final int interval = sharedPreferences.getInt(Constants.INTERVAL, 60);
+
         Intent intent = getIntent();
         key = intent.getStringExtra(Constants.KEY_EXTRA);
-        gps = new GpsManager(interval);
-        gps.startLocationUpdates();
+        Log.d("DEBUG", "Got key " + key);
+        gps = new GpsManager(interval, this);
+        gps.start();
+
+        final Handler handler = new Handler();
         sendData = new Runnable() {
             @Override
             public void run() {
-                double[] location = gps.getLocation();
-                SoapManager sManager = new SoapManager(credentials,location,key);
-                sManager.gpsService();
+                if (!stopSendingData) {
+                    String lat = gps.getLatitude();
+                    String lng = gps.getLongitude();
+                    if (lat != null && lng != null) {
+                        double[] location = new double[]{Double.valueOf(lat), Double.valueOf(lng)};
+                        SoapManager sManager = new SoapManager(credentials, location, key, MainActivity.this);
+                        sManager.gpsService();
+                    }
+                    handler.postDelayed(this, interval * 1000);
+                }
             }
         };
-    }
-
-
-    public static void errorRetriever(int code){
-        if (code == Constants.ERROR_RELOG){
-
-            logOut();
-        }
-        else if(code == Constants.ERROR_UNKNOWN){
-            Toast.makeText(MainActivity.mContext, "Υπήρξε πρόβλημα στην αποστολή δεδομένων " +
-                    "(έχετε ενεργή σύνδεση στο internet;", Toast.LENGTH_LONG).show();
-        }
+        sendData.run();
     }
 
     public static void logOut(){
@@ -144,9 +147,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, settings.class);
+            /*Intent intent = new Intent(this, settings.class);
             intent.putExtra("cred", credentials);
-            startActivity(intent);
+            startActivity(intent);*/
             return true;
         }
 
@@ -159,9 +162,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.credits) {
-            Intent intent = new Intent(this, credits.class);
+            /*Intent intent = new Intent(this, credits.class);
             intent.putExtra("cred", credentials);
-            startActivity(intent);
+            startActivity(intent);*/
         } else if (id == R.id.exit) {
             disconnect();
         }
@@ -171,7 +174,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private  void checkForNetwork() {
+    void disconnect() {
+        stopSendingData = true;
+    }
+
+    private void checkForNetwork() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo active = connectivityManager.getActiveNetworkInfo();
         if (active == null) {
@@ -196,6 +203,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Animation out = AnimationUtils.loadAnimation(this, R.anim.problem_alert_out);
             internet.startAnimation(out);
             internet.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void loginHandler(int code, String key) {
+
+    }
+
+    @Override
+    public void logoutHandler(int code) {
+        if (code == Constants.ERROR_RELOG) {
+            logOut();
+        } else if (code == Constants.ERROR_UNKNOWN){
+            Log.d("DEBUG", "Error Unknown");
         }
     }
 }

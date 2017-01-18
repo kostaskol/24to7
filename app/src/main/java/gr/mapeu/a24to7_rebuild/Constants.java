@@ -2,14 +2,14 @@ package gr.mapeu.a24to7_rebuild;
 
 
 public class Constants {
-    static final String URL = "";
+    static final String URL = "http://mapgr.eu/GPSService/GPSService.svc?wsdl";
     static final String NAMESPACE = "http://tempuri.org/";
 
-    static final String METHOD_LOGIN = "GPSLogin";
-    static final String SOAP_ACTION_LOGIN = NAMESPACE + METHOD_LOGIN;
+    static final String METHOD_LOGIN = "GPSServiceLogin";
+    static final String SOAP_ACTION_LOGIN = "http://tempuri.org/IGPSService/GPSServiceLogin";
 
     static final String METHOD_SERVICE = "GPSService";
-    static final String SOAP_ACTION_SERVICE = NAMESPACE + METHOD_SERVICE;
+    static final String SOAP_ACTION_SERVICE = "http://tempuri.org/IGPSService/GPSServiceLogin";
 
     static final String RE_LOGIN_CODE = "777";
     static final String CODE_SUCC = "567";
@@ -27,6 +27,6 @@ public class Constants {
     static final String PASS = "password";
     static final String INTERVAL = "interval";
 
-    static final int MILF = 1000;
+    static final int MIN_INTERVAL = 1000;
 
 }

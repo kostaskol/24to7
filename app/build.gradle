@@ -24,9 +24,9 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:design:25.0.0'
-    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.1.0'
     testCompile 'junit:junit:4.12'
-    compile files('/home/kostas/StudioProjects/24to7-Rebuild/libs/ksoap2-android-assembly-2.5.8-jar-with-dependencies.jar')
+    compile files('/home/kostas/AndroidProjects/24to7-Rebuild/libs/ksoap2-android-assembly-2.5.8-jar-with-dependencies.jar')
     compile 'com.google.android.gms:play-services-location:10.0.1'
 }

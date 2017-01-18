@@ -20,21 +20,21 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
-public class LoginScreen extends AppCompatActivity {
+public class LoginScreen extends AppCompatActivity implements LoginCallback {
 
-    static Context loginContext;
+    Context loginContext;
     static private int REQUEST_CODE_RECOVERY_PLAY_SERVICES = 200;
 
 
-    static ImageButton logIn;
-    static ImageButton next;
-    static ImageButton back;
-    static ImageButton linkToPage;
+    ImageButton logIn;
+    ImageButton next;
+    ImageButton back;
+    ImageButton linkToPage;
 
-    static ProgressBar pb;
+    ProgressBar pb;
 
-    static LinearLayout passLayout;
-    static LinearLayout userLayout;
+    LinearLayout passLayout;
+    LinearLayout userLayout;
 
     static Animation passOff;
     static Animation passOn;
@@ -42,18 +42,20 @@ public class LoginScreen extends AppCompatActivity {
     static Animation userOn;
     static Animation logOn;
 
-    static EditText userEdit;
-    static EditText passEdit;
+    EditText userEdit;
+    EditText passEdit;
 
-    static Button hideUserKeyboard;
-    static Button hidePassKeyboard;
+    Button hideUserKeyboard;
+    Button hidePassKeyboard;
 
-    static Context loginScreenContext;
+    Context loginScreenContext;
 
     static SharedPreferences sharedPreferences;
     static SharedPreferences.Editor editor;
 
-    @Override
+    ButtonCallbacks buttonCallbacks;
+    AnimationCallbacks animationCallbacks;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_screen);
@@ -117,26 +119,28 @@ public class LoginScreen extends AppCompatActivity {
     }
 
     void createListeners() {
+        buttonCallbacks = new ButtonCallbacks(this);
+        animationCallbacks = new AnimationCallbacks(this);
         //Initialize ALL Animation and Button listeners
         Animations.passDisappear(passLayout, logIn, back);
 
-        hideUserKeyboard.setOnClickListener(Callbacks.ButtonCallbacks.hideKeyboardListener);
+        hideUserKeyboard.setOnClickListener(buttonCallbacks.hideKeyboardListener);
 
-        hidePassKeyboard.setOnClickListener(Callbacks.ButtonCallbacks.hideKeyboardListener);
+        hidePassKeyboard.setOnClickListener(buttonCallbacks.hideKeyboardListener);
 
-        next.setOnClickListener(Callbacks.ButtonCallbacks.nextListener);
+        next.setOnClickListener(buttonCallbacks.nextListener);
 
-        passOn.setAnimationListener(Callbacks.AnimationCallbacks.passOnAnimation);
+        passOn.setAnimationListener(animationCallbacks.passOnAnimation);
 
-        userOn.setAnimationListener(Callbacks.AnimationCallbacks.userOnAnimation);
+        userOn.setAnimationListener(animationCallbacks.userOnAnimation);
 
-        userOff.setAnimationListener(Callbacks.AnimationCallbacks.userOffAnimation);
+        userOff.setAnimationListener(animationCallbacks.userOffAnimation);
 
-        back.setOnClickListener(Callbacks.ButtonCallbacks.backListener);
+        back.setOnClickListener(buttonCallbacks.backListener);
 
-        linkToPage.setOnClickListener(Callbacks.ButtonCallbacks.linkToPageListener);
+        linkToPage.setOnClickListener(buttonCallbacks.linkToPageListener);
 
-        logIn.setOnClickListener(Callbacks.ButtonCallbacks.loginListener);
+        logIn.setOnClickListener(buttonCallbacks.loginListener);
         //End Listeners
     }
 
@@ -168,20 +172,24 @@ public class LoginScreen extends AppCompatActivity {
         credentials[0] = sharedPreferences.getString(Constants.USER, null);
         credentials[1] = sharedPreferences.getString(Constants.PASS, null);
         if (credentials[0] != null && credentials[1] != null) {
-            SoapManager sManager = new SoapManager(credentials);
+            SoapManager sManager = new SoapManager(credentials, this);
             sManager.loginService();
         } else {
             Toast.makeText(this, "Παρακαλώ συνδεθείτε για να συνεχίσετε", Toast.LENGTH_SHORT).show();
         }
     }
 
-
-    static void logIn(int code, String key) {
+    @Override
+    public void loginHandler(int code, String key) {
         if (code == Constants.ERROR_NO_ERROR) {
-            Intent intent = new Intent(LoginScreen.loginContext, MainActivity.class);
-            intent.putExtra(Constants.KEY_EXTRA, key);
+            startActivity(new Intent(LoginScreen.this, MainActivity.class).putExtra(Constants.KEY_EXTRA, key));
         } else {
-            Toast.makeText(LoginScreen.loginContext, "Error", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Wrong cred", Toast.LENGTH_LONG);
         }
+    }
+
+    @Override
+    public void logoutHandler(int code) {
+
     }
 }
