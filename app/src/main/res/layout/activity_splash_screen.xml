@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="#fff"
-    tools:context="com.example.kostas.a24to7.splashScreen">
+    tools:context="gr.mapeu.a24to7_rebuild.Activities.SplashScreen">
 
     <ImageView
         android:contentDescription="@string/rotatingImg"

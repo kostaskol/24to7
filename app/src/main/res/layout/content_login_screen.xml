@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="gr.mapeu.a24to7_rebuild.LoginScreen"
+    tools:context="gr.mapeu.a24to7_rebuild.Activities.LoginScreen"
     tools:showIn="@layout/activity_login_screen">
 
 

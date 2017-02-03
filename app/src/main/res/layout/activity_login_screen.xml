@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="#fff"
-    tools:context="gr.mapeu.a24to7_rebuild.LoginScreen">
+    tools:context="gr.mapeu.a24to7_rebuild.Activities.LoginScreen">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
