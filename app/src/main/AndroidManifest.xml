@@ -13,21 +13,32 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.SplashScreen"
-            android:configChanges="orientation|screenSize|keyboardHidden" >
+        <activity
+            android:name=".Activities.SplashScreen"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".Activities.LoginScreen"
-                  android:windowSoftInputMode="adjustResize"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
-
-        <activity android:name=".Activities.MainActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name=".Activities.LoginScreen"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".Activities.MainDrawerActivity"
+            android:label="@string/title_activity_main_drawer"
+            android:parentActivityName=".Activities.LoginScreen"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="gr.mapeu.a24to7_rebuild.Activities.LoginScreen" />
+        </activity>
+        <activity android:name=".Activities.NewPharmacy"></activity>
     </application>
 
 </manifest>

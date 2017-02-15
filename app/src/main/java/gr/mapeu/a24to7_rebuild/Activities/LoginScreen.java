@@ -180,6 +180,7 @@ public class LoginScreen extends AppCompatActivity implements LoginCallback {
         credentials[0] = sharedPreferences.getString(Constants.USER, null);
         credentials[1] = sharedPreferences.getString(Constants.PASS, null);
         if (credentials[0] != null && credentials[1] != null) {
+            Log.d("Login", "Credentials are not null!");
             SoapManager sManager = new SoapManager(credentials, this);
             sManager.loginService();
         } else {
@@ -189,15 +190,16 @@ public class LoginScreen extends AppCompatActivity implements LoginCallback {
     }
 
     @Override
-    public void loginHandler(int code, String key) {
-        if (code == Constants.ERROR_NO_ERROR) {
-            final String user = userEdit.getText().toString();
-            final String pass = passEdit.getText().toString();
-            final SharedPreferences.Editor editor = sharedPreferences.edit();
+    public void loginHandler(int code, String key, String user, String pass) {
+        if (code == Constants.NO_ERROR) {
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
             editor.putString(Constants.USER, user);
             editor.putString(Constants.PASS, pass);
+
             editor.apply();
-            startActivity(new Intent(LoginScreen.this, MainActivity.class)
+            startActivity(new Intent(LoginScreen.this, MainDrawerActivity.class)
                     .putExtra(Constants.KEY_EXTRA, key));
         } else {
             runOnUiThread(new Runnable() {

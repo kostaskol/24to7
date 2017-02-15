@@ -10,28 +10,60 @@ import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import gr.mapeu.a24to7_rebuild.Bundles.ProductBundle;
+import gr.mapeu.a24to7_rebuild.Callbacks.ListManagerCallback;
 import gr.mapeu.a24to7_rebuild.Callbacks.LoginCallback;
 import gr.mapeu.a24to7_rebuild.Etc.Constants;
 
 public class SoapManager {
-    private String[] credentials;
-    private  String[] position;
-    private String[] key;
-    LoginCallback callback;
+    private final String[] credentials;
+    private  final String[] position;
+    private final String[] keyArr;
+    private final String key;
+    private LoginCallback callback;
+    private ListManagerCallback lCallback;
+    private boolean debug = true;
 
+    /*
+     * GPSService constructor
+     */
     public SoapManager(String[] cred, double[] pos, String key, LoginCallback callback) {
         this.credentials = cred;
         this.position = new String[2];
         this.position[0] = String.valueOf(pos[0]);
         this.position[1] = String.valueOf(pos[1]);
-        this.key = new String[1];
-        this.key[0] = key;
+        this.keyArr = new String[1];
+        this.keyArr[0] = key;
+        this.key = null;
         this.callback = callback;
     }
 
+
+    /*
+     * GPSServiceLogin constructor
+     */
     public SoapManager(String[] cred, LoginCallback callback) {
         this.credentials = cred;
         this.callback = callback;
+        this.position = null;
+        this.key = null;
+        this.keyArr = null;
+
+    }
+
+    /*
+     * GPSServiceGetList constructor
+     */
+    public SoapManager(String key, ListManagerCallback callback) {
+        this.credentials = null;
+        this.callback = null;
+        this.keyArr = null;
+        this.position = null;
+        this.key = key;
+        this.lCallback = callback;
     }
 
     public void loginService() {
@@ -65,13 +97,13 @@ public class SoapManager {
                     Log.d("ASYNC", "Got return code: " + returnCode);
                     String key = response.getPropertyAsString("pKey");
                     if (returnCode.equals(Constants.CODE_WRONG_CRED)) {
-                        callback.loginHandler(Constants.ERROR_WRONG_CRED, null);
+                        callback.loginHandler(Constants.ERROR_WRONG_CRED, null, cred[0], cred[1]);
                     } else {
-                        callback.loginHandler(Constants.ERROR_NO_ERROR, key);
+                        callback.loginHandler(Constants.NO_ERROR, key, cred[0], cred[1]);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    callback.loginHandler(Constants.ERROR_UNKNOWN, null);
+                    callback.loginHandler(Constants.ERROR_UNKNOWN, null, null, null);
                 }
                 return null;
             }
@@ -98,10 +130,9 @@ public class SoapManager {
                     SoapObject request = new SoapObject(Constants.NAMESPACE, Constants.METHOD_SERVICE);
 
                     request.addProperty("UserName", cred[0]);
-                    request.addProperty("PassWord", cred[1]);
                     request.addProperty("Lat", pos[0]);
                     request.addProperty("Lng", pos[1]);
-                    request.addProperty("Key", key[0]);
+                    request.addProperty("pKey", key[0]);
 
                     SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
                     envelope.dotNet = true;
@@ -116,7 +147,7 @@ public class SoapManager {
                     if (response.equals(Constants.RE_LOGIN_CODE)) {
                         callback.logoutHandler(Constants.ERROR_RELOG);
                     } else {
-                        callback.logoutHandler(Constants.ERROR_NO_ERROR);
+                        callback.logoutHandler(Constants.NO_ERROR);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -129,6 +160,97 @@ public class SoapManager {
             protected void onPostExecute(Void aVoid) {
 
             }
-        }.execute(this.credentials, this.position, this.key);
+        }.execute(this.credentials, this.position, this.keyArr);
+    }
+
+    public void getProductList() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected Void doInBackground(Void ... params) {
+                if (!debug) {
+                    SoapObject response;
+                    try {
+                        SoapObject request = new SoapObject(Constants.NAMESPACE,
+                                Constants.METHOD_LIST);
+                        request.addProperty("PKey", key);
+
+                        SoapSerializationEnvelope envelope =
+                                new SoapSerializationEnvelope(SoapEnvelope.VER11);
+
+                        envelope.dotNet = true;
+                        envelope.setOutputSoapObject(request);
+
+                        HttpTransportSE transportSE = new HttpTransportSE(Constants.URL);
+                        transportSE.call(Constants.SOAP_ACTION_LIST, envelope);
+
+                        // Get response and split it appropriately
+                        response = (SoapObject) envelope.getResponse();
+                        String routeNumber = response.getPropertyAsString("RouteNumber");
+                        SoapObject list = (SoapObject) response.getProperty("List");
+
+                        String[] stringList = new String[list.getPropertyCount()];
+                        List<ProductBundle> productList = new ArrayList<>();
+
+                        for (int i = 0; i < stringList.length; i++) {
+                            stringList[i] = list.getPropertyAsString(i);
+                        }
+
+                        // Assumes format of type: pharmacyCode/productCode
+                        for (String tmp : stringList) {
+                            String[] splitString = tmp.split("/");
+
+                            if (splitString.length != 2) {
+                                Log.d("SOAP MANAGER", "Invalid formatting");
+                                lCallback.handleList(0, null, Constants.ERROR_INV_FORM);
+                                return null;
+                            }
+
+                            ProductBundle tmpBundle = new ProductBundle(splitString[0], splitString[1]);
+                            productList.add(tmpBundle);
+                        }
+
+                        int routeNum;
+                        try {
+                            routeNum = Integer.parseInt(routeNumber);
+                        } catch (NumberFormatException nfe) {
+                            nfe.printStackTrace();
+                            lCallback.handleList(0, null, Constants.ERROR_MALFORMED_ROUTE_NUMBER);
+                            return null;
+                        }
+                        lCallback.handleList(routeNum, productList, Constants.NO_ERROR);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                } else {
+                    String[] list = {"1024/90311017", "1023/013314"};
+                    List<ProductBundle> tmpList = new ArrayList<>();
+                    for (String tmp : list) {
+                        String[] splitList = tmp.split("/");
+                        if (splitList.length != 2) {
+                            lCallback.handleList(0, null, Constants.ERROR_INV_FORM);
+                            return null;
+                        }
+
+                        ProductBundle bundle = new ProductBundle(splitList[0], splitList[1]);
+                        tmpList.add(bundle);
+                    }
+
+                    lCallback.handleList(1, tmpList, Constants.NO_ERROR);
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+
+            }
+        }.execute();
     }
 }

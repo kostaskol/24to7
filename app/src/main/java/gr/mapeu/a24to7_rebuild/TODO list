@@ -1,0 +1,7 @@
+TODOs:
+    By priority:
+        1. Create scanner activity
+        2. Debug GPSService (does it send data now??)
+        3. Turn GPS sender into IntentService
+        4. Debug Web Service (can't do that yet)
+        5. Finish the rest of the features (settings, credits etc)
