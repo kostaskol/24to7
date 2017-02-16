@@ -1,7 +1,53 @@
 TODOs:
     By priority:
-        1. Debug GPSService (does it send data now??)
-        2. Figure out how Re-Login will work after key has expired
-        3. Turn GPS sender into IntentService
-        4. Debug Web Service (can't do that yet)
-        5. Finish the rest of the features (settings, credits etc)
+        1. Figure out how Re-Login will work after key has expired
+            Idea:
+                Have the service notify the Main Screen. Have the Main Screen
+            attempt to re-login and acquire the key. If it succeeds, it's all good.
+            If there is a problem (the credentials are no longer valid), log the user out
+            and prompt them to log in
+
+            How-to:
+                Have an InterCallback interface. Have loginCallback, logoutCallback, gpsManagerCallback,
+            ListManagerCallback, ListResponseCallback extend the InterCallback interface.
+
+                                           +-------------+
+                                           |InterCallback|
+                                           +-------------+
+                                            /     |     \
+                                           /      |      \
+                                          /       |       \
+                                         /        |        \
+                                        /         |         ---------
+                                       /          |                  \
+                                +-------------++------------+         \
+                                | LogCallback || GpsManager |      ListCallback
+                                +------------ +|  Callback  |           /\
+                                 /       |     +------------+          /  \
+                                /        |                            /    \
+                               /         |                           /      \
+                              /          |               +--------------+ +-------------+
+                             /           |               | ListResponse | | ListManager |
+                            /            |               |    Handler   | |  Callback   |
+                           /             |               +--------------+ +-------------+
+                    +-------------+ +----------------+
+                    |LoginCallback| | LogoutCallback |
+                    +-------------+ +----------------+
+
+            MainScreen: Implements both LogCallbacks. If logout is called, it tries to re-login.
+                        If Login is called with an error code, it calls logOut()
+
+                        Implements ListResponseHandler to handle the incoming list updates
+
+            LoginScreen: Implements LoginCallback and allows the user into the MainScreen if
+                         Login is called with no error code
+
+            Service: Implements the GpsManagerCallback to handle permission problems. If one exists
+                     it broadcasts an error signal and MainScreen handles it
+
+
+           Note: I could replace all callbacks with Broadcasts. It would increase additional code
+           requirements by too much. Scratch that
+        2. Create a Callback interface hierarchy (for better organizing)
+        3. Debug Web Service (can't do that yet)
+        4. Finish the rest of the features (settings, credits etc)

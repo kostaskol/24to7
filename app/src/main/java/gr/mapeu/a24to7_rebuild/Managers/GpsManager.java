@@ -38,10 +38,10 @@ public class GpsManager implements GoogleApiClient.ConnectionCallbacks,
     private Context mContext;
     private GpsManagerCallback callback;
 
-    public GpsManager(int interval, Activity activity) {
+    public GpsManager(int interval, Context context) {
         this.interval = interval;
-        this.mContext = activity;
-        this.callback = (GpsManagerCallback) activity;
+        this.mContext = context;
+        this.callback = (GpsManagerCallback) context;
         mGoogleApiClient = new GoogleApiClient.Builder(mContext)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)

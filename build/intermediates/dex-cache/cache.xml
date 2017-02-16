@@ -178,7 +178,7 @@
         jumboMode="true"
         optimize="true"
         revision="24.0.3"
-        sha1="9299c718ec6605034ea5b0306c54a6e85441e833">
+        sha1="6122c841a5859da1ccbf6a3a1b36fb5cc2f23f32">
         <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_66d6f079f66875ba885e158594ac862d4c064d08/classes.dex" />
     </item>
     <item

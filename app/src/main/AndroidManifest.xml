@@ -38,7 +38,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="gr.mapeu.a24to7_rebuild.Activities.LoginScreen" />
         </activity>
-        <activity android:name=".Activities.NewPharmacy"></activity>
+        <activity android:name=".Activities.NewPharmacy" />
+
+        <service
+            android:name=".Services.GpsSender"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

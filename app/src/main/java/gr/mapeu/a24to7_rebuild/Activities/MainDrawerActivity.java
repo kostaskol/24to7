@@ -1,18 +1,20 @@
 package gr.mapeu.a24to7_rebuild.Activities;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -28,45 +30,26 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import gr.mapeu.a24to7_rebuild.Callbacks.GpsManagerCallback;
 import gr.mapeu.a24to7_rebuild.Callbacks.ListResponseHandler;
-import gr.mapeu.a24to7_rebuild.Callbacks.LoginCallback;
 import gr.mapeu.a24to7_rebuild.Etc.Constants;
 import gr.mapeu.a24to7_rebuild.HelpfulClasses.AlertBuilder;
-import gr.mapeu.a24to7_rebuild.Managers.GpsManager;
 import gr.mapeu.a24to7_rebuild.Managers.ListManager;
-import gr.mapeu.a24to7_rebuild.Managers.SoapManager;
 import gr.mapeu.a24to7_rebuild.R;
 import gr.mapeu.a24to7_rebuild.Managers.DatabaseManager;
+import gr.mapeu.a24to7_rebuild.Services.GpsSender;
 
 public class MainDrawerActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, LoginCallback,
-        ListResponseHandler, GpsManagerCallback {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        ListResponseHandler {
 
     private String[] credentials = new String[2];
     private String key;
-    GpsManager gps;
-
-    private ScheduledFuture cancelSend;
-    private final ScheduledExecutorService schedulerSend = Executors.newScheduledThreadPool(1);
-    private Runnable sendData;
 
     PowerManager mPowerManager;
     PowerManager.WakeLock mWakeLock;
 
     SharedPreferences sharedPreferences;
-
-    private boolean stopSendingData = false;
-
-    public Context mContext;
-
-    private Button getListBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,17 +68,15 @@ public class MainDrawerActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        mContext = this;
-
         initialize();
     }
 
 
     @Override
-    public void onStart(){
-        super.onStart();
-        cancelSend = schedulerSend.scheduleAtFixedRate(sendData, gps.getInterval(),
-                gps.getInterval(), TimeUnit.SECONDS);
+    public void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(relog,
+                new IntentFilter("relog"));
     }
 
     public void initialize() {
@@ -103,7 +84,7 @@ public class MainDrawerActivity extends AppCompatActivity
 
         // Keep the CPU running (screen will still turn off)
         mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = mPowerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "myWakeLock");
+        mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "myWakeLock");
         mWakeLock.acquire();
 
         //Get credentials from prefs
@@ -113,40 +94,25 @@ public class MainDrawerActivity extends AppCompatActivity
         // Check if user has set a custom interval
         final int interval = sharedPreferences.getInt(Constants.INTERVAL, 60);
 
-
-        Intent intent = getIntent();
-
         key = sharedPreferences.getString(Constants.PKEY, null);
         if (key == null) {
-            //TODO: How did we not get a key from login screen?
+            // How did we not get a key from login screen?
             Log.e("Main screen", "No key exists!");
             return;
         }
-        gps = new GpsManager(interval, this);
-        gps.start();
 
-        // Send data every <interval>
-        final Handler handler = new Handler();
-        sendData = new Runnable() {
-            @Override
-            public void run() {
-                if (!stopSendingData) {
-                    String lat = gps.getLatitude();
-                    String lng = gps.getLongitude();
-                    if (lat != null && lng != null) {
-                        double[] location = new double[]{Double.valueOf(lat), Double.valueOf(lng)};
-                        SoapManager sManager = new SoapManager(credentials, location,
-                                key, MainDrawerActivity.this);
+        Intent serviceIntent = new Intent(this, GpsSender.class);
+        serviceIntent
+                .putExtra(Constants.KEY_EXTRA, key)
+                .putExtra(Constants.CREDENTIALS_EXTRA, credentials)
+                .putExtra(Constants.SERVICE_INTERVAL_EXTRA, interval)
+                .putExtra(Constants.ALL_EXTRAS, "");
 
-                        sManager.gpsService();
-                    }
-                    handler.postDelayed(this, interval * 1000);
-                }
-            }
-        };
-        sendData.run();
+        startService(serviceIntent);
 
-        getListBtn = (Button) findViewById(R.id.get_list_btn);
+
+
+        final Button getListBtn = (Button) findViewById(R.id.get_list_btn);
 
         getListBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -211,8 +177,13 @@ public class MainDrawerActivity extends AppCompatActivity
         });
     }
 
-    public static void logOut() {
-
+    public void logOut() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Constants.USER, null);
+        editor.putString(Constants.PASS, null);
+        editor.apply();
+        stopSending();
+        finishAffinity();
     }
 
     //Navigation drawer stuff
@@ -247,7 +218,7 @@ public class MainDrawerActivity extends AppCompatActivity
             intent.putExtra("cred", credentials);
             startActivity(intent);*/
         } else if (id == R.id.exit) {
-            disconnect();
+            exit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -255,8 +226,15 @@ public class MainDrawerActivity extends AppCompatActivity
         return true;
     }
 
-    void disconnect() {
-        stopSendingData = true;
+    void exit() {
+        stopSending();
+        finishAffinity();
+    }
+
+    private void stopSending() {
+        Intent intent = new Intent("stop");
+        intent.putExtra(Constants.STOP_SENDING_DATA, "");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     private void checkForNetwork() {
@@ -285,15 +263,6 @@ public class MainDrawerActivity extends AppCompatActivity
             Animation out = AnimationUtils.loadAnimation(this, R.anim.problem_alert_out);
             internet.startAnimation(out);
             internet.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void logoutHandler(int code) {
-        if (code == Constants.ERROR_RELOG) {
-            logOut();
-        } else if (code == Constants.ERROR_UNKNOWN){
-            Log.d("DEBUG", "Error Unknown");
         }
     }
 
@@ -343,12 +312,6 @@ public class MainDrawerActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onPermissionNotGranted() {
-        ActivityCompat.requestPermissions(this,
-                new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
-                Constants.ACCESS_FINE_LOCATION_RESULT);
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[],
@@ -361,11 +324,28 @@ public class MainDrawerActivity extends AppCompatActivity
             }
         }
     }
-    /*
-     * NOT used
-     */
-    @Override
-    public void loginHandler(int code, String key, String user, String pass) {}
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                Constants.ACCESS_FINE_LOCATION_RESULT);
+    }
+
+
+    private BroadcastReceiver relog = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.hasExtra(Constants.RELOG_EXTRA)) {
+                relogin();
+            } else {
+                requestPermission();
+            }
+        }
+    };
+
+    private void relogin() {
+        // TODO: Handle this
+    }
 
 
 }

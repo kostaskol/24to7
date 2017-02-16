@@ -34,8 +34,6 @@ public class Constants {
     /*
     ___________________________________Inter Activity Communication_________________________________
      */
-    // Key extra
-    public static final String KEY_EXTRA = "key_extra";
 
     // Error codes
     public static final int ERROR_RELOG = 1;
@@ -74,4 +72,17 @@ public class Constants {
     ___________________________________Permissions___________________________________
      */
     public static final int ACCESS_FINE_LOCATION_RESULT = 1002;
+
+
+    /*
+    ___________________________________Service___________________________________
+     */
+    // Extras
+    public static final String KEY_EXTRA = "key extra";
+    public static final String SERVICE_INTERVAL_EXTRA = "interval";
+    public static final String CREDENTIALS_EXTRA = "creds";
+    public static final String ALL_EXTRAS = "all extras";
+    public static final String RELOG_EXTRA = "relog";
+    public static final String STOP_SENDING_DATA = "stop";
+    public static final String PERMISSIONS_EXTRA = "ask for permissions";
 }
