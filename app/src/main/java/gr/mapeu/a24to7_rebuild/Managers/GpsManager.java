@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -18,6 +19,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import gr.mapeu.a24to7_rebuild.Callbacks.GpsManagerCallback;
 import gr.mapeu.a24to7_rebuild.Etc.Constants;
 
 /**
@@ -34,10 +36,12 @@ public class GpsManager implements GoogleApiClient.ConnectionCallbacks,
     private String longitude;
     private int interval;
     private Context mContext;
+    private GpsManagerCallback callback;
 
     public GpsManager(int interval, Activity activity) {
         this.interval = interval;
         this.mContext = activity;
+        this.callback = (GpsManagerCallback) activity;
         mGoogleApiClient = new GoogleApiClient.Builder(mContext)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -48,6 +52,7 @@ public class GpsManager implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public void start() {
+        Log.d("Gps Manager", "Connecting...");
         mGoogleApiClient.connect();
     }
 
@@ -56,6 +61,7 @@ public class GpsManager implements GoogleApiClient.ConnectionCallbacks,
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(interval* Constants.SECONDS)
                 .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        Log.d("Gps Manager", "Creating location request");
     }
 
     private boolean startLocationUpdates(){
@@ -63,8 +69,10 @@ public class GpsManager implements GoogleApiClient.ConnectionCallbacks,
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi
                     .requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            Log.d("GPS Manager", "Started location updates");
             return true;
         } else {
+            callback.onPermissionNotGranted();
             return false;
         }
     }
@@ -79,6 +87,7 @@ public class GpsManager implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        Log.d("Gps Manager", "Connected");
         startLocationUpdates();
     }
 
@@ -97,7 +106,7 @@ public class GpsManager implements GoogleApiClient.ConnectionCallbacks,
     public void onLocationChanged(Location location) {
         latitude = String.valueOf(location.getLatitude());
         longitude = String.valueOf(location.getLongitude());
-        System.out.println("lat: " + location.getLatitude());
+
     }
 
     public int getInterval() {

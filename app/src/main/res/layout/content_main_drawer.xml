@@ -12,15 +12,6 @@
     tools:context=".Activities.MainDrawerActivity"
     tools:showIn="@layout/app_bar_main_drawer">
 
-    <ImageView
-        android:contentDescription="@string/split"
-        android:layout_width="match_parent"
-        android:layout_height="7dp"
-        android:background="@color/colorPrimary"
-        android:id="@+id/splitter"
-        android:layout_marginTop="200dp"
-        android:layout_alignParentTop="true" />
-
     <LinearLayout
         android:layout_width="300dp"
         android:layout_height="wrap_content"
@@ -47,8 +38,8 @@
 
     <ImageButton
         android:contentDescription="@string/app_icon"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:background="@drawable/iconlogin"
         android:id="@+id/link"
         android:layout_alignParentTop="true"
@@ -107,7 +98,7 @@
         android:layout_height="@dimen/box_size"
         android:layout_marginRight="29dp"
         android:layout_marginEnd="29dp"
-        android:id="@+id/new_scan"
+        android:id="@+id/new_scan_btn"
         android:layout_alignTop="@+id/get_list_btn"
         android:layout_alignRight="@+id/linearLayout"
         android:layout_alignEnd="@+id/linearLayout" />
@@ -120,6 +111,16 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="19dp"
         android:id="@+id/print_list_btn" />
+
+    <ImageView
+        android:contentDescription="@string/split"
+        android:layout_width="match_parent"
+        android:layout_height="7dp"
+        android:background="@color/colorPrimary"
+        android:id="@+id/splitter"
+        android:layout_below="@+id/link"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 
 </RelativeLayout>

@@ -51,19 +51,32 @@ public class SoapManager {
         this.position = null;
         this.key = null;
         this.keyArr = null;
-
     }
 
     /*
      * GPSServiceGetList constructor
      */
-    public SoapManager(String key, ListManagerCallback callback) {
-        this.credentials = null;
+    public SoapManager(String key, String user, ListManagerCallback callback) {
+        this.credentials = new String[1];
+        this.credentials[0] = user;
         this.callback = null;
         this.keyArr = null;
         this.position = null;
         this.key = key;
         this.lCallback = callback;
+    }
+
+    /*
+     * GPSServiceNotify constructor
+     */
+    public SoapManager(String key, String user) {
+        this.credentials = new String[1];
+        this.credentials[0] = user;
+        this.key = key;
+        this.callback = null;
+        this.lCallback = null;
+        this.keyArr = null;
+        this.position = null;
     }
 
     public void loginService() {
@@ -123,7 +136,8 @@ public class SoapManager {
                 cred = params[0];
                 pos = params[1];
                 key = params[2];
-                Log.d("SOAP", "Sending Data: " + cred[0] + ", " + cred[1]);
+                Log.d("SOAP", "Sending Data: " + cred[0] + ", " + cred[1] + ", " +
+                        pos[0] + ", " + pos[1] + "\nwith key: " + key[0]);
 
                 String response;
                 try {
@@ -141,7 +155,7 @@ public class SoapManager {
                     HttpTransportSE transportSE = new HttpTransportSE(Constants.URL);
                     transportSE.call(Constants.SOAP_ACTION_SERVICE, envelope);
 
-                    SoapPrimitive soapResponse = (SoapPrimitive) envelope.getResponse();
+                    SoapObject soapResponse = (SoapObject) envelope.getResponse();
                     response = soapResponse.toString();
                     Log.d("RESPONSE", "Got response " + response);
                     if (response.equals(Constants.RE_LOGIN_CODE)) {
@@ -155,15 +169,10 @@ public class SoapManager {
                 }
                 return null;
             }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-
-            }
         }.execute(this.credentials, this.position, this.keyArr);
     }
 
-    public void getProductList() {
+    void getProductList() {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected void onPreExecute() {
@@ -177,7 +186,8 @@ public class SoapManager {
                     try {
                         SoapObject request = new SoapObject(Constants.NAMESPACE,
                                 Constants.METHOD_LIST);
-                        request.addProperty("PKey", key);
+                        request.addProperty("pKey", key);
+                        request.addProperty("UserName", credentials[0]);
 
                         SoapSerializationEnvelope envelope =
                                 new SoapSerializationEnvelope(SoapEnvelope.VER11);
@@ -190,8 +200,9 @@ public class SoapManager {
 
                         // Get response and split it appropriately
                         response = (SoapObject) envelope.getResponse();
-                        String routeNumber = response.getPropertyAsString("RouteNumber");
-                        SoapObject list = (SoapObject) response.getProperty("List");
+                        String routeNumber = response.getPropertyAsString("Shift");
+                        // TODO: if route number is -1, there is no route
+                        SoapObject list = (SoapObject) response.getProperty("PharmacyList");
 
                         String[] stringList = new String[list.getPropertyCount()];
                         List<ProductBundle> productList = new ArrayList<>();
@@ -229,7 +240,7 @@ public class SoapManager {
                     }
                     return null;
                 } else {
-                    String[] list = {"1024/90311017", "1023/013314"};
+                    String[] list = {"1024/90311017", "1024/013314"};
                     List<ProductBundle> tmpList = new ArrayList<>();
                     for (String tmp : list) {
                         String[] splitList = tmp.split("/");
@@ -246,11 +257,39 @@ public class SoapManager {
                     return null;
                 }
             }
+        }.execute();
+    }
+
+    public void notifyCompletion() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
 
             @Override
-            protected void onPostExecute(Void aVoid) {
+            protected Void doInBackground(Void ... params) {
+                SoapObject request = new SoapObject(Constants.NAMESPACE, Constants.METHOD_NOTIFY);
+                request.addProperty("pKey", key);
+                request.addProperty("UserName", credentials[0]);
 
+                SoapSerializationEnvelope envelope =
+                        new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                envelope.dotNet = true;
+                envelope.setOutputSoapObject(request);
+
+                HttpTransportSE transportSE = new HttpTransportSE(Constants.URL);
+                try {
+                    transportSE.call(Constants.SOAP_ACTION_NOTIFY, envelope);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
             }
         }.execute();
     }
+
+    // TODO: notify after each pharmacy has been completed
+    // NAME: GPSServiceBaskets
+    // UserName, pKey, PharmacyID
 }

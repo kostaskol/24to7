@@ -79,8 +79,14 @@ public class DatabaseManager extends SQLiteOpenHelper {
         return count > 0;
     }
 
+    /*
+     * Returns true if the product code has been found
+     * AND
+     * has been deleted from the database
+     */
     public boolean scanProd(String pharmCode, String prodCode) {
         SQLiteDatabase db = this.getWritableDatabase();
+        // Making sure that the pharmacy code matches the product code as well
         String selectQuery = "select * from " + Constants.TABLE_NAME +
                 " where " + Constants.COL_PHARM + " = " + pharmCode + " and " +
                 Constants.COL_PROD + " = " + prodCode;
@@ -94,8 +100,11 @@ public class DatabaseManager extends SQLiteOpenHelper {
             return false;
         }
 
+        // If we get no results from the query, we return false
+        // TODO: maybe replace boolean return value with error codes?
         if (cursor.getCount() == 0) {
             cursor.close();
+            db.close();
             return false;
         }
 
@@ -110,9 +119,15 @@ public class DatabaseManager extends SQLiteOpenHelper {
         } catch (SQLiteException sqle) {
             sqle.printStackTrace();
             return false;
+        } finally {
+            db.close();
         }
     }
 
+    /*
+     * Debug only
+     * TODO: Remove before release
+     */
     public void printList() {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "select * from " + Constants.TABLE_NAME;
@@ -126,6 +141,57 @@ public class DatabaseManager extends SQLiteOpenHelper {
         }
 
         cursor.close();
+        db.close();
+    }
 
+    public int remainingPharm(String pharmCode) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "select * from " + Constants.TABLE_NAME + " where " +
+                Constants.COL_PHARM + " = " + pharmCode;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(query, null);
+            return cursor.getCount();
+        } catch (SQLiteException sqle) {
+            sqle.printStackTrace();
+            return -1;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+    }
+
+    public int remainingOverall() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "select * from " + Constants.TABLE_NAME;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(query, null);
+            return cursor.getCount();
+        } catch (SQLiteException sqle) {
+            sqle.printStackTrace();
+            return -1;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+    }
+
+    public boolean deleteAll() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "delete from " + Constants.TABLE_NAME;
+        try {
+            db.execSQL(query);
+            return true;
+        } catch(SQLiteException sqle) {
+            sqle.printStackTrace();
+            return false;
+        } finally {
+            db.close();
+        }
     }
 }

@@ -3,6 +3,15 @@
 
     <item
         is-multidex="true"
+        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/25.1.0/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="f02263e35e52668dd17b73bf961437e3d562b35f">
+        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-media-compat-25.1.0_b97731a6ec2b8f4764a90f35e63f891c436e4d22/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/support-v4/25.1.0/jars/classes.jar"
         jumboMode="true"
         optimize="true"
@@ -18,78 +27,6 @@
         revision="24.0.3"
         sha1="44a694d4095be84c2888764b1f7256b385c030ad">
         <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.google.android.gms-play-services-location-10.0.1_0711c1348bb23c76f01c01555306ebdc1fc4cd04/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/home/kostas/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/25.1.0/support-annotations-25.1.0.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="64cb6b229a8bdfd907bc8dd46839a0053e4c018d">
-        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/support-annotations-25.1.0_fdb705504fe3cb61008bf6656dbfb3a216b3b4b8/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/25.1.0/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="b266c8faa5af72e579b9da36ef35053ffed6ac64">
-        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-recyclerview-v7-25.1.0_48aa4117a286a0cd52c95a18ecac680159fc88d0/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/transition/25.1.0/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="d38084015027549951cbaea5d5f6fb795cc81151">
-        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-transition-25.1.0_103261f6b91176cb40225680feb525f74435c128/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.1.0/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="1630658fbc2d222b988603c27b4a4249586fbfe7">
-        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-appcompat-v7-25.1.0_f84ac98490cf4abf9b85ca98781bc8ce4dd8143f/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="7f82142d9e6db7310a17b9a42f934f597d8b3215">
-        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_66d6f079f66875ba885e158594ac862d4c064d08/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/25.1.0/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="aee64634871d88a419d59eb743c1258a60f19700">
-        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-core-ui-25.1.0_db9d38542f255c899b64e7de797fbddc33d8d1dc/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/25.1.0/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="e79aa3d9a16f8c9f16377c0608de70a8f31e5d80">
-        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-vector-drawable-25.1.0_291897c6b3e27ddfe1adfb55d55ad75821b1c1c7/classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/25.1.0/jars/classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="f02263e35e52668dd17b73bf961437e3d562b35f">
-        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-media-compat-25.1.0_b97731a6ec2b8f4764a90f35e63f891c436e4d22/classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -115,8 +52,17 @@
         jumboMode="true"
         optimize="true"
         revision="24.0.3"
-        sha1="d516a3ab324967017115bbea76bc719b0d3d51a1">
+        sha1="d98a924e8aa76670b72219bcd3cb6b779c19c81e">
         <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_67f7e94b5ad3f50e33123162102980f807e1b8ac/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/kostas/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/25.1.0/support-annotations-25.1.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="64cb6b229a8bdfd907bc8dd46839a0053e4c018d">
+        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/support-annotations-25.1.0_fdb705504fe3cb61008bf6656dbfb3a216b3b4b8/classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -165,6 +111,15 @@
     </item>
     <item
         is-multidex="true"
+        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/25.1.0/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="b266c8faa5af72e579b9da36ef35053ffed6ac64">
+        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-recyclerview-v7-25.1.0_48aa4117a286a0cd52c95a18ecac680159fc88d0/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/support-compat/25.1.0/jars/classes.jar"
         jumboMode="true"
         optimize="true"
@@ -192,12 +147,57 @@
     </item>
     <item
         is-multidex="true"
+        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/transition/25.1.0/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="d38084015027549951cbaea5d5f6fb795cc81151">
+        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-transition-25.1.0_103261f6b91176cb40225680feb525f74435c128/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/design/25.1.0/jars/classes.jar"
         jumboMode="true"
         optimize="true"
         revision="24.0.3"
         sha1="30103d98fa5ed824b54af839c85e2111f9bde8ec">
         <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-design-25.1.0_d3e38a45e6e27956f80409b140c653591748dae8/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.1.0/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="1630658fbc2d222b988603c27b4a4249586fbfe7">
+        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-appcompat-v7-25.1.0_f84ac98490cf4abf9b85ca98781bc8ce4dd8143f/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="9299c718ec6605034ea5b0306c54a6e85441e833">
+        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_66d6f079f66875ba885e158594ac862d4c064d08/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/25.1.0/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="aee64634871d88a419d59eb743c1258a60f19700">
+        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-core-ui-25.1.0_db9d38542f255c899b64e7de797fbddc33d8d1dc/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/25.1.0/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="e79aa3d9a16f8c9f16377c0608de70a8f31e5d80">
+        <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-vector-drawable-25.1.0_291897c6b3e27ddfe1adfb55d55ad75821b1c1c7/classes.dex" />
     </item>
 
 </items>

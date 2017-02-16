@@ -1,16 +1,18 @@
 package gr.mapeu.a24to7_rebuild.Activities;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -19,7 +21,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -27,17 +28,17 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import gr.mapeu.a24to7_rebuild.Callbacks.GpsManagerCallback;
 import gr.mapeu.a24to7_rebuild.Callbacks.ListResponseHandler;
 import gr.mapeu.a24to7_rebuild.Callbacks.LoginCallback;
 import gr.mapeu.a24to7_rebuild.Etc.Constants;
+import gr.mapeu.a24to7_rebuild.HelpfulClasses.AlertBuilder;
 import gr.mapeu.a24to7_rebuild.Managers.GpsManager;
 import gr.mapeu.a24to7_rebuild.Managers.ListManager;
 import gr.mapeu.a24to7_rebuild.Managers.SoapManager;
@@ -46,9 +47,8 @@ import gr.mapeu.a24to7_rebuild.Managers.DatabaseManager;
 
 public class MainDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoginCallback,
-        ListResponseHandler {
+        ListResponseHandler, GpsManagerCallback {
 
-    private String[] location = new String[2];
     private String[] credentials = new String[2];
     private String key;
     GpsManager gps;
@@ -116,12 +116,11 @@ public class MainDrawerActivity extends AppCompatActivity
 
         Intent intent = getIntent();
 
-        if (intent.hasExtra(Constants.KEY_EXTRA)) {
-            key = intent.getStringExtra(Constants.KEY_EXTRA);
-            Log.d("DEBUG", "Got key " + key);
-        } else {
-            // LoginScreen did not provide a key.
-            // FIXME: How do we handle that?
+        key = sharedPreferences.getString(Constants.PKEY, null);
+        if (key == null) {
+            //TODO: How did we not get a key from login screen?
+            Log.e("Main screen", "No key exists!");
+            return;
         }
         gps = new GpsManager(interval, this);
         gps.start();
@@ -138,6 +137,7 @@ public class MainDrawerActivity extends AppCompatActivity
                         double[] location = new double[]{Double.valueOf(lat), Double.valueOf(lng)};
                         SoapManager sManager = new SoapManager(credentials, location,
                                 key, MainDrawerActivity.this);
+
                         sManager.gpsService();
                     }
                     handler.postDelayed(this, interval * 1000);
@@ -151,8 +151,53 @@ public class MainDrawerActivity extends AppCompatActivity
         getListBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ListManager lManager = new ListManager(MainDrawerActivity.this, key);
-                lManager.getList();
+                getListBtn.setEnabled(false);
+                final String user = sharedPreferences.getString(Constants.USER, null);
+                if (user == null) {
+                    // huh?
+                    Log.e("MAIN SCREEN", "Could not find username (???)");
+                    return;
+                }
+                DatabaseManager dbManager = new DatabaseManager(MainDrawerActivity.this);
+                int rem = dbManager.remainingOverall();
+                if (rem != 0) {
+                    String title = "Οι παραγγελίες δεν έχουν ολοκληρωθεί";
+                    String message = "Απομένουν " + rem + " παραγγελίες. Είσαστε σίγουρος πως " +
+                            "θέλετε να ανανεώσετε την λίστα; " +
+                            "(Οι προηγούμενες παραγγελίες θα διαγραφούν)";
+                    DialogInterface.OnClickListener positive =
+                            new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ListManager lManager =
+                                    new ListManager(MainDrawerActivity.this, key, user);
+                            lManager.deleteList();
+                            lManager.getList();
+                        }
+                    };
+
+                    DialogInterface.OnClickListener negative = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    };
+                    AlertBuilder alert = new AlertBuilder(MainDrawerActivity.this,
+                            message, title, positive, negative);
+                    alert.showDialog();
+                }
+            getListBtn.setEnabled(true);
+            }
+        });
+
+        final Button newPharm = (Button) findViewById(R.id.new_scan_btn);
+
+        newPharm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newPharm.setEnabled(false);
+                startActivity(new Intent(MainDrawerActivity.this, NewPharmacy.class));
+                newPharm.setEnabled(true);
             }
         });
 
@@ -203,28 +248,11 @@ public class MainDrawerActivity extends AppCompatActivity
             startActivity(intent);*/
         } else if (id == R.id.exit) {
             disconnect();
-        } else if (id == R.id.barcode_scanner) {
-            new IntentIntegrator(this).initiateScan();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (result != null) {
-            if (result.getContents() == null) {
-                Toast.makeText(this, "Ακυρώθηκε", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     void disconnect() {
@@ -302,11 +330,37 @@ public class MainDrawerActivity extends AppCompatActivity
                 });
 
                 break;
+            case Constants.ERROR_NO_MORE_ROUTES:
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainDrawerActivity.this, "There are no more routes at" +
+                                " this moment. Try again later", Toast.LENGTH_LONG).show();
+                    }
+                });
             default:
                 // Wut?
         }
     }
 
+    @Override
+    public void onPermissionNotGranted() {
+        ActivityCompat.requestPermissions(this,
+                new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                Constants.ACCESS_FINE_LOCATION_RESULT);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[],
+                                          int[] grantResults) {
+        if (requestCode == Constants.ACCESS_FINE_LOCATION_RESULT) {
+            if (grantResults.length == 0
+                || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Αυτή η εφαρμογή πρέπει να γνωρίζει την τοποθεσία σας.",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    }
     /*
      * NOT used
      */

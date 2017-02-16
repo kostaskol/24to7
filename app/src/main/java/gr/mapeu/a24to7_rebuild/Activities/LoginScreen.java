@@ -197,10 +197,10 @@ public class LoginScreen extends AppCompatActivity implements LoginCallback {
 
             editor.putString(Constants.USER, user);
             editor.putString(Constants.PASS, pass);
-
+            editor.putString(Constants.PKEY, key);
             editor.apply();
-            startActivity(new Intent(LoginScreen.this, MainDrawerActivity.class)
-                    .putExtra(Constants.KEY_EXTRA, key));
+            Log.d("Login", "Got key: " + key);
+            startActivity(new Intent(LoginScreen.this, MainDrawerActivity.class));
         } else {
             runOnUiThread(new Runnable() {
                 @Override
