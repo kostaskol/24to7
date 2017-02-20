@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import gr.mapeu.a24to7_rebuild.Activities.LoginScreen;
 import gr.mapeu.a24to7_rebuild.Etc.Animations;
-import gr.mapeu.a24to7_rebuild.Managers.SoapManager;
+import gr.mapeu.a24to7_rebuild.SoapManagers.SoapLoginServiceManager;
 
 public class ButtonCallbacks {
 
@@ -58,8 +58,10 @@ public class ButtonCallbacks {
             final String pass = context.passEdit.getText().toString();
             if (!user.equals("") &&
                     !pass.equals("")) {
-                SoapManager soapManager = new SoapManager(new String[] {user, pass}, context);
-                soapManager.loginService();
+                SoapLoginServiceManager soapManager =
+                        new SoapLoginServiceManager(new String[] {user, pass}, context);
+                soapManager.setCallback(context);
+                soapManager.call();
             } else {
                 Toast.makeText(context, "Παρακαλώ συμπληρώστε και το όνομα χρήστη και τον κωδικό",
                         Toast.LENGTH_LONG).show();

@@ -20,19 +20,20 @@ TODOs:
                                          /        |        \
                                         /         |         ---------
                                        /          |                  \
-                                +-------------++------------+         \
-                                | LogCallback || GpsManager |      ListCallback
-                                +------------ +|  Callback  |           /\
-                                 /       |     +------------+          /  \
-                                /        |                            /    \
-                               /         |                           /      \
-                              /          |               +--------------+ +-------------+
-                             /           |               | ListResponse | | ListManager |
-                            /            |               |    Handler   | |  Callback   |
-                           /             |               +--------------+ +-------------+
-                    +-------------+ +----------------+
-                    |LoginCallback| | LogoutCallback |
-                    +-------------+ +----------------+
+                              +-------------+ +------------+     +------------+
+                              | LogCallback | | GpsManager |     |ListCallback|
+                              +------------ + |  Callback  |     +------------+
+                                 /       |    +------------+            /\
+                                /        |                             /  \
+                               /         |                            /    \
+                              /          |                           /      \
+                             /           |               +--------------+ +-------------+
+                            /            |               | ListResponse | | ListManager |
+                           /             |               |    Handler   | |  Callback   |
+                          /              |               +--------------+ +-------------+
+                  +-------------+ +---------------------+
+                  |LoginCallback| | SoapResponseHandler |
+                  +-------------+ +---------------------+
 
             MainScreen: Implements both LogCallbacks. If logout is called, it tries to re-login.
                         If Login is called with an error code, it calls logOut()
@@ -51,3 +52,18 @@ TODOs:
         2. Create a Callback interface hierarchy (for better organizing)
         3. Debug Web Service (can't do that yet)
         4. Finish the rest of the features (settings, credits etc)
+
+
+
+        Do something about shifts (must not update their shift if it has not been finished)
+
+
+        -> move this one up the list __
+                                       |
+                                       v
+        Preferences are working. Need to restart service upon interval change (URL still working)
+
+
+        Add gps and internet checkers (on GpsSender and on NewPharmacy)
+
+        Find some time to sort this shit out!

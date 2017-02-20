@@ -43,7 +43,9 @@
         <service
             android:name=".Services.GpsSender"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".Activities.ActivityPreference"></activity>
     </application>
 
 </manifest>

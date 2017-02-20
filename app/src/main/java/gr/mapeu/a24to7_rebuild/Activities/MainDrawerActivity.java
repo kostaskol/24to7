@@ -15,6 +15,7 @@ import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -30,10 +31,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import gr.mapeu.a24to7_rebuild.Callbacks.GpsManagerCallback;
-import gr.mapeu.a24to7_rebuild.Callbacks.ListResponseHandler;
+import gr.mapeu.a24to7_rebuild.Callbacks.ListManagerCallback;
 import gr.mapeu.a24to7_rebuild.Etc.Constants;
-import gr.mapeu.a24to7_rebuild.HelpfulClasses.AlertBuilder;
 import gr.mapeu.a24to7_rebuild.Managers.ListManager;
 import gr.mapeu.a24to7_rebuild.R;
 import gr.mapeu.a24to7_rebuild.Managers.DatabaseManager;
@@ -41,15 +40,16 @@ import gr.mapeu.a24to7_rebuild.Services.GpsSender;
 
 public class MainDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        ListResponseHandler {
+        ListManagerCallback {
 
     private String[] credentials = new String[2];
     private String key;
 
-    PowerManager mPowerManager;
-    PowerManager.WakeLock mWakeLock;
+    private SharedPreferences sharedPreferences;
 
-    SharedPreferences sharedPreferences;
+    private boolean shiftStarted;
+
+    private PowerManager.WakeLock mWakeLock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,38 +77,34 @@ public class MainDrawerActivity extends AppCompatActivity
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(relog,
                 new IntentFilter("relog"));
+        int interval = sharedPreferences.getInt(Constants.PREF_INTERVAL, 30);
+        Log.d("MainDrawer", "New interval is: " + interval);
+
     }
 
     public void initialize() {
-        sharedPreferences = getSharedPreferences(Constants.MYPREFS, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(Constants.MY_PREFS, MODE_PRIVATE);
 
         // Keep the CPU running (screen will still turn off)
-        mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        PowerManager mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "myWakeLock");
         mWakeLock.acquire();
 
         //Get credentials from prefs
-        credentials[0] = LoginScreen.sharedPreferences.getString(Constants.USER, null);
-        credentials[1] = LoginScreen.sharedPreferences.getString(Constants.PASS, null);
+        credentials[0] = LoginScreen.sharedPreferences.getString(Constants.PREF_USER, null);
+        credentials[1] = LoginScreen.sharedPreferences.getString(Constants.PREF_PASS, null);
 
         // Check if user has set a custom interval
-        final int interval = sharedPreferences.getInt(Constants.INTERVAL, 60);
+        final int interval = sharedPreferences.getInt(Constants.PREF_INTERVAL, 60);
 
-        key = sharedPreferences.getString(Constants.PKEY, null);
+        key = sharedPreferences.getString(Constants.PREF_PKEY, null);
         if (key == null) {
             // How did we not get a key from login screen?
             Log.e("Main screen", "No key exists!");
             return;
         }
 
-        Intent serviceIntent = new Intent(this, GpsSender.class);
-        serviceIntent
-                .putExtra(Constants.KEY_EXTRA, key)
-                .putExtra(Constants.CREDENTIALS_EXTRA, credentials)
-                .putExtra(Constants.SERVICE_INTERVAL_EXTRA, interval)
-                .putExtra(Constants.ALL_EXTRAS, "");
-
-        startService(serviceIntent);
+        shiftStarted = sharedPreferences.getBoolean(Constants.PREF_SHIFT_STARTED, false);
 
 
 
@@ -118,40 +114,16 @@ public class MainDrawerActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 getListBtn.setEnabled(false);
-                final String user = sharedPreferences.getString(Constants.USER, null);
+                final String user = sharedPreferences.getString(Constants.PREF_USER, null);
                 if (user == null) {
                     // huh?
                     Log.e("MAIN SCREEN", "Could not find username (???)");
                     return;
                 }
-                DatabaseManager dbManager = new DatabaseManager(MainDrawerActivity.this);
-                int rem = dbManager.remainingOverall();
-                if (rem != 0) {
-                    String title = "Οι παραγγελίες δεν έχουν ολοκληρωθεί";
-                    String message = "Απομένουν " + rem + " παραγγελίες. Είσαστε σίγουρος πως " +
-                            "θέλετε να ανανεώσετε την λίστα; " +
-                            "(Οι προηγούμενες παραγγελίες θα διαγραφούν)";
-                    DialogInterface.OnClickListener positive =
-                            new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            ListManager lManager =
-                                    new ListManager(MainDrawerActivity.this, key, user);
-                            lManager.deleteList();
-                            lManager.getList();
-                        }
-                    };
 
-                    DialogInterface.OnClickListener negative = new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    };
-                    AlertBuilder alert = new AlertBuilder(MainDrawerActivity.this,
-                            message, title, positive, negative);
-                    alert.showDialog();
-                }
+                ListManager lManager =
+                        new ListManager(MainDrawerActivity.this, key, user);
+                lManager.getList();
             getListBtn.setEnabled(true);
             }
         });
@@ -175,12 +147,63 @@ public class MainDrawerActivity extends AppCompatActivity
                 dbManager.printList();
             }
         });
+
+        final Button startShift = (Button) findViewById(R.id.start_end_shift_btn);
+
+        if (shiftStarted) {
+            Intent serviceIntent = new Intent(MainDrawerActivity.this, GpsSender.class);
+            serviceIntent
+                    .putExtra(Constants.KEY_EXTRA, key)
+                    .putExtra(Constants.CREDENTIALS_EXTRA, credentials)
+                    .putExtra(Constants.SERVICE_INTERVAL_EXTRA, interval)
+                    .putExtra(Constants.ALL_EXTRAS, "");
+
+            startService(serviceIntent);
+            startShift.setText("ΤΕΛΟΣ ΒΑΡΔΙΑΣ");
+        } else {
+            startShift.setText("ΑΡΧΗ ΒΑΡΔΙΑΣ");
+        }
+
+        startShift.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startShift.setEnabled(false);
+                if (!shiftStarted) {
+                    shiftStarted = true;
+
+                    Intent serviceIntent = new Intent(MainDrawerActivity.this, GpsSender.class);
+                    serviceIntent
+                            .putExtra(Constants.KEY_EXTRA, key)
+                            .putExtra(Constants.CREDENTIALS_EXTRA, credentials)
+                            .putExtra(Constants.SERVICE_INTERVAL_EXTRA, interval)
+                            .putExtra(Constants.ALL_EXTRAS, "");
+
+                    startService(serviceIntent);
+
+
+
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean(Constants.PREF_SHIFT_STARTED, true);
+                    editor.apply();
+
+                    startShift.setText("ΤΕΛΟΣ ΒΑΡΔΙΑΣ");
+                } else {
+                    shiftStarted = false;
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean(Constants.PREF_SHIFT_STARTED, false);
+                    editor.apply();
+                    startShift.setText("ΑΡΧΗ ΒΑΡΔΙΑΣ");
+                    stopSending();
+                }
+                startShift.setEnabled(true);
+            }
+        });
     }
 
     public void logOut() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(Constants.USER, null);
-        editor.putString(Constants.PASS, null);
+        editor.putString(Constants.PREF_USER, null);
+        editor.putString(Constants.PREF_PASS, null);
         editor.apply();
         stopSending();
         finishAffinity();
@@ -213,12 +236,12 @@ public class MainDrawerActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.credits) {
-            /*Intent intent = new Intent(this, credits.class);
-            intent.putExtra("cred", credentials);
-            startActivity(intent);*/
+        if (id == R.id.settings) {
+            startActivity(new Intent(this, ActivityPreference.class));
         } else if (id == R.id.exit) {
             exit();
+        } else if (id == R.id.log_out) {
+            logOut();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -227,14 +250,43 @@ public class MainDrawerActivity extends AppCompatActivity
     }
 
     void exit() {
-        stopSending();
-        finishAffinity();
+        if (shiftStarted) {
+            String message = "Η τοποθεσία της συσκευής συνεχίζει να στέλνεται ακόμη και " +
+                    "όταν η εφαρμογή είναι κλειστή. Θέλετε να σταματήσετε τώρα την αποστολή τοπθεσίας;" +
+                    "(Μπορείτε να σταματήσετε την αποστολή " +
+                    "μόνοι σας πατώντας το κουμπί \"ΤΕΛΟΣ ΒΑΡΔΙΑΣ\")";
+            String title = "Προσοχή";
+            DialogInterface.OnClickListener stop = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    stopSending();
+                    stopSending();
+                    finishAffinity();
+                }
+            };
+
+            DialogInterface.OnClickListener dontStop = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finishAffinity();
+                }
+            };
+
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setTitle(title);
+            alert.setMessage(message);
+            alert.setPositiveButton("Τέλος", stop);
+            alert.setNeutralButton("Ακύρωση", null);
+            alert.setNegativeButton("Κλείσιμο", dontStop);
+            alert.show();
+        } else {
+            finishAffinity();
+        }
+
     }
 
     private void stopSending() {
-        Intent intent = new Intent("stop");
-        intent.putExtra(Constants.STOP_SENDING_DATA, "");
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        stopService(new Intent(this, GpsSender.class));
     }
 
     private void checkForNetwork() {
@@ -267,7 +319,7 @@ public class MainDrawerActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListResponse(int returnCode) {
+    public void onListAcquiredResponse(int returnCode) {
         switch (returnCode) {
             case Constants.ERROR_INV_FORM:
                 // TODO: Do some stuff here
@@ -312,10 +364,9 @@ public class MainDrawerActivity extends AppCompatActivity
         }
     }
 
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[],
-                                          int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                          @NonNull int[] grantResults) {
         if (requestCode == Constants.ACCESS_FINE_LOCATION_RESULT) {
             if (grantResults.length == 0
                 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
@@ -346,6 +397,5 @@ public class MainDrawerActivity extends AppCompatActivity
     private void relogin() {
         // TODO: Handle this
     }
-
 
 }

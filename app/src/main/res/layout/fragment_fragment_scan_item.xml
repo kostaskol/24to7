@@ -1,0 +1,53 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="gr.mapeu.a24to7_rebuild.Fragments.FragmentScanItem">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <TextView
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rem_one_tv"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="18dp"
+            android:id="@+id/rem_actual_tv"
+            android:textSize="18sp" />
+
+        <TextView
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:id="@+id/rem_two_tv"
+            android:textSize="18sp"
+            android:layout_marginTop="13dp"
+            android:layout_below="@+id/rem_actual_tv"
+            android:layout_alignLeft="@+id/rem_one_tv"
+            android:layout_alignStart="@+id/rem_one_tv"
+            android:layout_width="125dp" />
+
+        <TextView
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="109dp"
+            android:id="@+id/rem_one_tv"
+            android:textSize="18sp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_width="125dp" />
+
+        <Button
+            android:text="Σαρωση νεου προιοντος"
+            android:id="@+id/scan_new_prod_btn"
+            android:layout_marginTop="23dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_below="@+id/rem_two_tv"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
+</FrameLayout>

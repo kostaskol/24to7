@@ -1,6 +1,6 @@
 package gr.mapeu.a24to7_rebuild.Services;
 
-import android.Manifest;
+import android.app.IntentService;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,17 +9,17 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import gr.mapeu.a24to7_rebuild.Callbacks.GpsManagerCallback;
-import gr.mapeu.a24to7_rebuild.Callbacks.LoginCallback;
+import gr.mapeu.a24to7_rebuild.Callbacks.GpsSenderResponseHandler;
 import gr.mapeu.a24to7_rebuild.Etc.Constants;
 import gr.mapeu.a24to7_rebuild.Managers.GpsManager;
-import gr.mapeu.a24to7_rebuild.Managers.SoapManager;
+import gr.mapeu.a24to7_rebuild.SoapManagers.SoapGpsServiceManager;
 
-public class GpsSender extends Service implements LoginCallback, GpsManagerCallback {
+public class GpsSender extends Service
+        implements GpsSenderResponseHandler, GpsManagerCallback {
 
     private boolean stopSendingData = false;
     private GpsManager gpsManager;
@@ -27,9 +27,15 @@ public class GpsSender extends Service implements LoginCallback, GpsManagerCallb
     private String key;
     private int interval;
 
+    @Override
+    public void onCreate() {
+
+    }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
 
         if (intent.hasExtra(Constants.ALL_EXTRAS)) {
             this.credentials = intent.getStringArrayExtra(Constants.CREDENTIALS_EXTRA);
@@ -43,32 +49,40 @@ public class GpsSender extends Service implements LoginCallback, GpsManagerCallb
         this.gpsManager = new GpsManager(this.interval * 1000, this);
         this.gpsManager.start();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
-                new IntentFilter("stop"));
-
         // Send data every <interval>
         final Handler handler = new Handler();
         Runnable sendData = new Runnable() {
             @Override
             public void run() {
                 if (!stopSendingData) {
+                    Log.d("GpsSender", "Still alive bitches!!");
                     String lat = gpsManager.getLatitude();
                     String lng = gpsManager.getLongitude();
                     if (lat != null && lng != null) {
                         double[] location = new double[]{Double.valueOf(lat), Double.valueOf(lng)};
-                        SoapManager sManager = new SoapManager(credentials, location,
-                                key, GpsSender.this);
+                        SoapGpsServiceManager sManager =
+                                new SoapGpsServiceManager(
+                                        credentials,
+                                        location,
+                                        key,
+                                        GpsSender.this);
 
+                        sManager.setCallback(GpsSender.this);
                         sManager.gpsService();
                     }
                     handler.postDelayed(this, interval * 1000);
+                } else {
+                    stopSelf();
                 }
             }
         };
+
         sendData.run();
 
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
+
+
 
     @Nullable
     @Override
@@ -77,25 +91,27 @@ public class GpsSender extends Service implements LoginCallback, GpsManagerCallb
     }
 
     @Override
-    public void loginHandler(int code, String key, String user, String pass) {}
+    public boolean stopService(Intent name) {
+        this.stopSendingData = true;
+        return true;
+    }
 
     @Override
-    public void logoutHandler(int code) {
-        Intent intent = new Intent("service");
-        intent.putExtra(Constants.RELOG_EXTRA, "relog");
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    public void onDestroy() {
+        Log.d("GpsSender", "On destroy called");
+        super.onDestroy();
+        this.stopSendingData = true;
     }
 
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d("Service", "Got stop message. Stopping");
-            if (intent.hasExtra(Constants.STOP_SENDING_DATA)) {
-                stopSendingData = true;
-            }
+    @Override
+    public void onGpsServiceResponse(int code) {
+        if (code == Constants.ERROR_RELOG) {
+            Intent intent = new Intent("service");
+            intent.putExtra(Constants.RELOG_EXTRA, "relog");
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
-    };
+    }
 
     @Override
     public void onPermissionNotGranted() {

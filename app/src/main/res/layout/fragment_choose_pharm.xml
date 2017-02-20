@@ -1,0 +1,32 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="gr.mapeu.a24to7_rebuild.Fragments.FragmentChoosePharm">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="110dp"
+        android:id="@+id/pharm_code_edit"
+        android:hint="Κωδικός Φαρμακείου" />
+
+    <ImageButton
+        android:contentDescription="@string/moveToPass"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:id="@+id/move_to_scan_btn"
+        android:background="@drawable/circlearrowright"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>
+
+</FrameLayout>

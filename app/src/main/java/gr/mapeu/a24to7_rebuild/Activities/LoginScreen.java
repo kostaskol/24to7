@@ -21,14 +21,14 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import gr.mapeu.a24to7_rebuild.Callbacks.ButtonCallbacks;
+import gr.mapeu.a24to7_rebuild.Callbacks.LoginResponseHandler;
 import gr.mapeu.a24to7_rebuild.Etc.Animations;
 import gr.mapeu.a24to7_rebuild.Callbacks.AnimationCallbacks;
 import gr.mapeu.a24to7_rebuild.Etc.Constants;
-import gr.mapeu.a24to7_rebuild.Callbacks.LoginCallback;
 import gr.mapeu.a24to7_rebuild.R;
-import gr.mapeu.a24to7_rebuild.Managers.SoapManager;
+import gr.mapeu.a24to7_rebuild.SoapManagers.SoapLoginServiceManager;
 
-public class LoginScreen extends AppCompatActivity implements LoginCallback {
+public class LoginScreen extends AppCompatActivity implements LoginResponseHandler {
 
     Context loginContext;
     static private int REQUEST_CODE_RECOVERY_PLAY_SERVICES = 200;
@@ -116,8 +116,8 @@ public class LoginScreen extends AppCompatActivity implements LoginCallback {
         hideUserKeyboard.setVisibility(View.GONE);
         hidePassKeyboard.setVisibility(View.GONE);
 
-        //Initialise Preferences
-        sharedPreferences = getSharedPreferences(Constants.MYPREFS, MODE_PRIVATE);
+        //Initialise ActivityPreference
+        sharedPreferences = getSharedPreferences(Constants.MY_PREFS, MODE_PRIVATE);
 
         //Prompt user to install/update Google Services
         checkForServices();
@@ -128,6 +128,7 @@ public class LoginScreen extends AppCompatActivity implements LoginCallback {
     void createListeners() {
         buttonCallbacks = new ButtonCallbacks(this);
         animationCallbacks = new AnimationCallbacks(this);
+
         //Initialize ALL Animation and Button listeners
         Animations.passDisappear(passLayout, logIn, back);
 
@@ -151,6 +152,9 @@ public class LoginScreen extends AppCompatActivity implements LoginCallback {
         //End Listeners
     }
 
+    /*
+     * Checks for Google play services availability
+     */
     private void checkForServices() {
         GoogleApiAvailability availability = GoogleApiAvailability.getInstance();
         int checkGoogleServices = availability.isGooglePlayServicesAvailable(this);
@@ -174,30 +178,37 @@ public class LoginScreen extends AppCompatActivity implements LoginCallback {
         }
     }
 
-    //If user has signed in before, log them in automatically
+    /*
+     * If user has signed in before, log them in automatically
+     */
     private void checkCredentials() {
         String[] credentials = new String[2];
-        credentials[0] = sharedPreferences.getString(Constants.USER, null);
-        credentials[1] = sharedPreferences.getString(Constants.PASS, null);
+        credentials[0] = sharedPreferences.getString(Constants.PREF_USER, null);
+        credentials[1] = sharedPreferences.getString(Constants.PREF_PASS, null);
         if (credentials[0] != null && credentials[1] != null) {
             Log.d("Login", "Credentials are not null!");
-            SoapManager sManager = new SoapManager(credentials, this);
-            sManager.loginService();
+            SoapLoginServiceManager sManager = new SoapLoginServiceManager(credentials, this);
+            sManager.setCallback(this);
+            sManager.call();
         } else {
             Toast.makeText(this, "Παρακαλώ συνδεθείτε για να συνεχίσετε",
                     Toast.LENGTH_SHORT).show();
         }
     }
 
+    /*
+     * Called by SoapManagerLogin. Supplies the code and key returned by the web service
+     * and the username and password that was used for the login
+     */
     @Override
-    public void loginHandler(int code, String key, String user, String pass) {
+    public void onLoginResponse(int code, String key, String user, String pass) {
         if (code == Constants.NO_ERROR) {
 
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
-            editor.putString(Constants.USER, user);
-            editor.putString(Constants.PASS, pass);
-            editor.putString(Constants.PKEY, key);
+            editor.putString(Constants.PREF_USER, user);
+            editor.putString(Constants.PREF_PASS, pass);
+            editor.putString(Constants.PREF_PKEY, key);
             editor.apply();
             Log.d("Login", "Got key: " + key);
             startActivity(new Intent(LoginScreen.this, MainDrawerActivity.class));
@@ -211,10 +222,5 @@ public class LoginScreen extends AppCompatActivity implements LoginCallback {
             });
 
         }
-    }
-
-    @Override
-    public void logoutHandler(int code) {
-
     }
 }

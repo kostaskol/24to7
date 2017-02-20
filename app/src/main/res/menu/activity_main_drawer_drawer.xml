@@ -9,6 +9,14 @@
             android:id="@+id/credits"
             android:title="@string/credits" />
         <item
+            android:id="@+id/settings"
+            android:title="Ρυθμίσεις" />
+
+        <item
+            android:title="Log out"
+            android:id="@+id/log_out" />
+
+        <item
             android:id="@+id/exit"
             android:title="@string/quit" />
     </group>

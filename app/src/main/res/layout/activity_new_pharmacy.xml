@@ -9,33 +9,11 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="gr.mapeu.a24to7_rebuild.Activities.NewPharmacy">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/rel_lay_placeholder">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:ems="10"
-        android:id="@+id/pharm_code_edit"
-        android:hint="Κωδικός φαρμακείου"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="64dp" />
-
-    <Button
-        android:text="Σάρωση προϊόντος"
-        android:layout_height="100dp"
-        android:id="@+id/pharm_scan"
-        android:layout_width="300dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="112dp" />
-
-    <Button
-        android:text="Επιβεβαίωση κωδικού"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/submit_pharm_code"
-        android:layout_below="@+id/pharm_code_edit"
-        android:layout_centerHorizontal="true" />
+    </RelativeLayout>
 
 </RelativeLayout>

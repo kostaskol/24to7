@@ -7,7 +7,7 @@ public class Constants {
      */
     // General
     // TODO: URL is different for each pharm -_-
-    public static final String URL = "http://85.73.231.120:8080/GPS24-7_Service/GPSService.svc?wsdl";
+    public static String URL = "http://79.130.20.30:8080/GPS24-7_Service/GPSService.svc?wsdl";
     public static final String NAMESPACE = "http://tempuri.org/";
 
     // Login
@@ -25,6 +25,10 @@ public class Constants {
     // Notify completion
     public static final String METHOD_NOTIFY = "GPSServiceNotify";
     public static final String SOAP_ACTION_NOTIFY = "http://tempuri.org/IGPSService/GPSServiceNotify";
+
+    // Notify pharmacy completion
+    public static final String METHOD_NOTIFY_PHARM = "GPSServiceBasket";
+    public static final String SOAP_ACTION_NOTIFY_PHARM = "http://tempuri.org/IGPSService/GPSServiceBasket";
 
     // Returned codes
     public static final String RE_LOGIN_CODE = "777";
@@ -47,12 +51,15 @@ public class Constants {
     /*
     ___________________________________Preferences___________________________________
      */
-    public static final String MYPREFS = "my_prefs";
-    public static final String USER = "username";
-    public static final String PASS = "password";
-    public static final String CURR_PHARM_CODE = "current pharm code";
-    public static final String INTERVAL = "interval";
-    public static final String PKEY = "pKey";
+    public static final String MY_PREFS = "my_prefs";
+    public static final String PREF_USER = "username";
+    public static final String PREF_PASS = "password";
+    public static final String PREF_CURR_PHARM_CODE = "current pharm code";
+    public static final String PREF_INTERVAL = "interval";
+    public static final String PREF_PKEY = "pKey";
+    public static final String PREF_SHIFT_STARTED = "shift started";
+    public static final String PREF_URL = "url";
+    public static final String PREF_DEBUG = "pref debug";
 
     public static final int MIN_INTERVAL = 1000;
 
