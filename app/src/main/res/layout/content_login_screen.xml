@@ -139,5 +139,15 @@
         android:layout_alignStart="@+id/link"
         android:layout_alignLeft="@id/link"/>
 
+    <ProgressBar
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/moveToPass"
+        android:layout_alignRight="@+id/loading"
+        android:layout_alignEnd="@+id/loading"
+        android:layout_marginTop="37dp"
+        android:id="@+id/progress_spinner" />
+
 
 </RelativeLayout>

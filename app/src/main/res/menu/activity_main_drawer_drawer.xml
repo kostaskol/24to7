@@ -3,18 +3,12 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/barcode_scanner"
-            android:title="Scan Barcode" />
-        <item
-            android:id="@+id/credits"
-            android:title="@string/credits" />
-        <item
             android:id="@+id/settings"
             android:title="Ρυθμίσεις" />
 
         <item
-            android:title="Log out"
-            android:id="@+id/log_out" />
+            android:id="@+id/log_out"
+            android:title="Log out" />
 
         <item
             android:id="@+id/exit"

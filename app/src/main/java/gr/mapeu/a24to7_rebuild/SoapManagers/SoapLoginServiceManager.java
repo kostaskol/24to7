@@ -58,8 +58,8 @@ public class SoapLoginServiceManager {
                     envelope.dotNet = true;
                     envelope.setOutputSoapObject(request);
 
-                    HttpTransportSE transportSE = new HttpTransportSE(url);
-                    SoapObject response = null;
+                    HttpTransportSE transportSE = new HttpTransportSE(url, 5000);
+                    SoapObject response;
                     try {
                         transportSE.call(Constants.SOAP_ACTION_LOGIN, envelope);
 
@@ -67,8 +67,12 @@ public class SoapLoginServiceManager {
                     } catch (Exception e) {
                         e.printStackTrace();
                         callback.onLoginResponse(Constants.ERROR_UNKNOWN, null, null, null);
+                        return null;
                     }
-                    assert response != null;
+                    if (response == null) {
+                        Log.e("SoapLogin", "Response is null");
+                        return null;
+                    }
                     String returnCode = response.getPropertyAsString("returnCode");
                     Log.d("ASYNC", "Got return code: " + returnCode);
                     String key = response.getPropertyAsString("pKey");

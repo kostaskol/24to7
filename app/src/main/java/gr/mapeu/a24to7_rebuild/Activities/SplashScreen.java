@@ -51,33 +51,34 @@ public class SplashScreen extends AppCompatActivity {
                     Log.i("ERROR", "Starting activity");
                     startActivity(intent);
                 } else {*/
-                    final EditText urlEdit = new EditText(SplashScreen.this);
-                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT);
-                    urlEdit.setLayoutParams(lp);
-                    TextView tv = new TextView(SplashScreen.this);
-                    tv.setText("Yo");
-                    tv.setLayoutParams(lp);
-                    AlertDialog.Builder alert = new AlertDialog.Builder(SplashScreen.this);
-                    String message = "Input company's URL: (without http:// and /GPS24-7_Service...";
-                    String title = "New Url";
-                    alert.setView(urlEdit);
-                    alert.setMessage(message);
-                    alert.setTitle(title);
-                    alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            String url = urlEdit.getText().toString();
-                            String actualUrl = "http://" + url + "/GPS24-7_Service/GPSService.svc?wsdl";
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString(Constants.PREF_URL, actualUrl);
-                            editor.apply();
+                final EditText urlEdit = new EditText(SplashScreen.this);
+                urlEdit.setText("87.203.78.43:8080");
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                urlEdit.setLayoutParams(lp);
+                TextView tv = new TextView(SplashScreen.this);
+                tv.setText("Yo");
+                tv.setLayoutParams(lp);
+                AlertDialog.Builder alert = new AlertDialog.Builder(SplashScreen.this);
+                String message = "Input company's URL: (without http:// and /GPS24-7_Service...";
+                String title = "New Url";
+                alert.setView(urlEdit);
+                alert.setMessage(message);
+                alert.setTitle(title);
+                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String url = urlEdit.getText().toString();
+                        String actualUrl = "http://" + url + "/GPS24-7_Service/GPSService.svc?wsdl";
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString(Constants.PREF_URL, actualUrl);
+                        editor.apply();
 
-                            startActivity(intent);
-                        }
-                    });
-                    alert.show();
+                        startActivity(intent);
+                    }
+                });
+                alert.show();
 
                 //}
             }

@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import gr.mapeu.a24to7_rebuild.Activities.NewPharmacy;
 import gr.mapeu.a24to7_rebuild.Etc.Constants;
 import gr.mapeu.a24to7_rebuild.HelpfulClasses.AlertBuilder;
 import gr.mapeu.a24to7_rebuild.Managers.DatabaseManager;
@@ -90,7 +91,7 @@ public class FragmentChoosePharm extends Fragment {
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
                 transaction.addToBackStack(null);
                 transaction.remove(FragmentChoosePharm.this);
-                transaction.add(R.id.rel_lay_placeholder, new FragmentScanItem());
+                transaction.add(R.id.rel_lay_placeholder, NewPharmacy.scanItem);
                 transaction.commit();
                 InputMethodManager inm = (InputMethodManager)
                                 getContext().getSystemService(Context.INPUT_METHOD_SERVICE);

@@ -73,7 +73,9 @@ public class SoapGpsServiceManager {
                     envelope.dotNet = true;
                     envelope.setOutputSoapObject(request);
 
+                    // HttpTransportSE transportSE = new HttpTransportSE("http://87.203.78.43:8080/GPS24-7_Service/GPSService.svc?wsdl");
                     HttpTransportSE transportSE = new HttpTransportSE(url);
+
                     transportSE.call(Constants.SOAP_ACTION_SERVICE, envelope);
 
                     SoapObject soapResponse = (SoapObject) envelope.getResponse();

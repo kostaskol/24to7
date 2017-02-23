@@ -2,7 +2,9 @@ package gr.mapeu.a24to7_rebuild.Activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,15 +22,20 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import gr.mapeu.a24to7_rebuild.BroadcastReceivers.NetworkBroadcastReceiver;
 import gr.mapeu.a24to7_rebuild.Callbacks.ButtonCallbacks;
 import gr.mapeu.a24to7_rebuild.Callbacks.LoginResponseHandler;
+import gr.mapeu.a24to7_rebuild.Callbacks.NetworkChangedListener;
 import gr.mapeu.a24to7_rebuild.Etc.Animations;
 import gr.mapeu.a24to7_rebuild.Callbacks.AnimationCallbacks;
 import gr.mapeu.a24to7_rebuild.Etc.Constants;
+import gr.mapeu.a24to7_rebuild.HelpfulClasses.AlertBuilder;
 import gr.mapeu.a24to7_rebuild.R;
 import gr.mapeu.a24to7_rebuild.SoapManagers.SoapLoginServiceManager;
+import static gr.mapeu.a24to7_rebuild.HelpfulClasses.ConnectivityCheckers.checkForNetwork;
 
-public class LoginScreen extends AppCompatActivity implements LoginResponseHandler {
+public class LoginScreen extends AppCompatActivity implements LoginResponseHandler,
+        NetworkChangedListener {
 
     Context loginContext;
     static private int REQUEST_CODE_RECOVERY_PLAY_SERVICES = 200;
@@ -38,8 +45,6 @@ public class LoginScreen extends AppCompatActivity implements LoginResponseHandl
     public ImageButton next;
     public ImageButton back;
     public ImageButton linkToPage;
-
-    public ProgressBar pb;
 
     public LinearLayout passLayout;
     public LinearLayout userLayout;
@@ -56,6 +61,8 @@ public class LoginScreen extends AppCompatActivity implements LoginResponseHandl
     public Button hideUserKeyboard;
     public Button hidePassKeyboard;
 
+    public ProgressBar progressSpinner;
+
     public Context loginScreenContext;
 
     static SharedPreferences sharedPreferences;
@@ -63,14 +70,38 @@ public class LoginScreen extends AppCompatActivity implements LoginResponseHandl
     public ButtonCallbacks buttonCallbacks;
     public AnimationCallbacks animationCallbacks;
 
+    private NetworkBroadcastReceiver networkReceiver;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_screen);
-        Log.i ("ERROR", "Started");
         loginContext = this;
 
         initialise();
         createListeners();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Create Network broadcast receiver
+        networkReceiver = new NetworkBroadcastReceiver(this);
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkReceiver, filter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (networkReceiver != null) {
+            unregisterReceiver(networkReceiver);
+            networkReceiver = null;
+        }
     }
 
     @Override
@@ -98,7 +129,8 @@ public class LoginScreen extends AppCompatActivity implements LoginResponseHandl
         userOn = AnimationUtils.loadAnimation(this, R.anim.useronscreen);
 
         //Progress Bar
-        pb = (ProgressBar) findViewById(R.id.loading);
+        progressSpinner = (ProgressBar) findViewById(R.id.progress_spinner);
+        progressSpinner.setVisibility(View.GONE);
 
         //Layouts
         passLayout = (LinearLayout) findViewById(R.id.passWord);
@@ -182,17 +214,25 @@ public class LoginScreen extends AppCompatActivity implements LoginResponseHandl
      * If user has signed in before, log them in automatically
      */
     private void checkCredentials() {
-        String[] credentials = new String[2];
-        credentials[0] = sharedPreferences.getString(Constants.PREF_USER, null);
-        credentials[1] = sharedPreferences.getString(Constants.PREF_PASS, null);
-        if (credentials[0] != null && credentials[1] != null) {
-            Log.d("Login", "Credentials are not null!");
-            SoapLoginServiceManager sManager = new SoapLoginServiceManager(credentials, this);
-            sManager.setCallback(this);
-            sManager.call();
+        if (checkForNetwork(this)) {
+            String[] credentials = new String[2];
+            credentials[0] = sharedPreferences.getString(Constants.PREF_USER, null);
+            credentials[1] = sharedPreferences.getString(Constants.PREF_PASS, null);
+            if (credentials[0] != null && credentials[1] != null) {
+                Log.d("Login", "Credentials are not null!");
+                SoapLoginServiceManager sManager = new SoapLoginServiceManager(credentials, this);
+                sManager.setCallback(this);
+                sManager.call();
+            } else {
+                Toast.makeText(this, "Παρακαλώ συνδεθείτε για να συνεχίσετε",
+                        Toast.LENGTH_SHORT).show();
+            }
         } else {
-            Toast.makeText(this, "Παρακαλώ συνδεθείτε για να συνεχίσετε",
-                    Toast.LENGTH_SHORT).show();
+            String title = "Πρόβλημα σύνδεσης";
+            String message = "Δεν ήταν δυνατή η σύνδεση στο δίκτυο. Βεβαιωθείτε πως τα δεδομένα " +
+                    "κινητής τηλεφωνίας είναι ανοιχτά και προσπαθήστε ξανά";
+            AlertBuilder alert = new AlertBuilder(this, message, title);
+            alert.showDialog();
         }
     }
 
@@ -202,25 +242,57 @@ public class LoginScreen extends AppCompatActivity implements LoginResponseHandl
      */
     @Override
     public void onLoginResponse(int code, String key, String user, String pass) {
-        if (code == Constants.NO_ERROR) {
+        switch (code) {
+            case Constants.NO_ERROR:
 
-            SharedPreferences.Editor editor = sharedPreferences.edit();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
 
-            editor.putString(Constants.PREF_USER, user);
-            editor.putString(Constants.PREF_PASS, pass);
-            editor.putString(Constants.PREF_PKEY, key);
-            editor.apply();
-            Log.d("Login", "Got key: " + key);
-            startActivity(new Intent(LoginScreen.this, MainDrawerActivity.class));
+                editor.putString(Constants.PREF_USER, user);
+                editor.putString(Constants.PREF_PASS, pass);
+                editor.putString(Constants.PREF_PKEY, key);
+                editor.apply();
+                Log.d("Login", "Got key: " + key);
+                startActivity(new Intent(LoginScreen.this, MainDrawerActivity.class));
+                break;
+            case Constants.ERROR_UNKNOWN:
+                String title = "Άγνωστο σφάλμα";
+                String message = "Υπήρξε κάποιο λάθος κατά την σύνδεση." +
+                        "Εάν είσαστε βέβαιοι πως έχετε σύνδεση στο ιντερνετ, επικοινωνήστε " +
+                        "με τον διαχειριστή δικτύου της αποθήκης σας για την επίλυση του " +
+                        "προβλήματος.";
+                final AlertBuilder alert = new AlertBuilder(this, message, title);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        alert.showDialog();
+                    }
+                });
+                break;
+            case Constants.ERROR_WRONG_CRED:
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(LoginScreen.this, "Τα στοιχεία που δώσατε είναι λανθασμένα. " +
+                                "Παρακαλώ προσπαθήστε ξανά.", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                break;
+        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressSpinner.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    @Override
+    public void onNetworkChanged(boolean status) {
+        if (status) {
+            checkCredentials();
         } else {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(LoginScreen.this, "Τα στοιχεία που δώσατε είναι λανθασμένα. " +
-                            "Παρακαλώ προσπαθήστε ξανά.", Toast.LENGTH_LONG).show();
-                }
-            });
-
+            Log.d("Login", "Network disabled");
         }
     }
 }

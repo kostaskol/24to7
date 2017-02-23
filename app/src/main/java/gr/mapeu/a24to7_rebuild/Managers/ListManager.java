@@ -25,6 +25,10 @@ public class ListManager implements ListResponseHandler {
         this.callback = (ListManagerCallback) context;
     }
 
+    public ListManager(Context context) {
+        this.context = context;
+    }
+
     public void getList() {
         Log.d("ListManager", "Getting list");
         SoapListServiceManager sManager = new SoapListServiceManager(this.user, this.key, context);

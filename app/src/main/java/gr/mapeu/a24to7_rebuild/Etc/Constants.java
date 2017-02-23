@@ -6,7 +6,7 @@ public class Constants {
     ___________________________________SOAP___________________________________
      */
     // General
-    // TODO: URL is different for each pharm -_-
+    // 87.203.78.43:8080
     public static String URL = "http://79.130.20.30:8080/GPS24-7_Service/GPSService.svc?wsdl";
     public static final String NAMESPACE = "http://tempuri.org/";
 
@@ -60,6 +60,7 @@ public class Constants {
     public static final String PREF_SHIFT_STARTED = "shift started";
     public static final String PREF_URL = "url";
     public static final String PREF_DEBUG = "pref debug";
+    public static final String PREF_SERVICE_STARTED = "service started";
 
     public static final int MIN_INTERVAL = 1000;
 

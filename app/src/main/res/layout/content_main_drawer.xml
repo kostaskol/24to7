@@ -91,15 +91,6 @@
         android:layout_alignRight="@+id/linearLayout"
         android:layout_alignEnd="@+id/linearLayout" />
 
-    <Button
-        android:text="Show List"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="19dp"
-        android:id="@+id/print_list_btn" />
-
     <ImageView
         android:contentDescription="@string/split"
         android:layout_width="match_parent"
@@ -130,6 +121,25 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="11dp"
         android:id="@+id/start_end_shift_btn" />
+
+    <Button
+        android:text="Show List"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="17dp"
+        android:id="@+id/print_list_btn"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/start_end_shift_btn"
+        android:layout_toEndOf="@+id/start_end_shift_btn" />
+
+    <Button
+        android:text="DELETE Db"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/delete_db_btn"
+        android:layout_below="@+id/get_list_btn"
+        android:layout_alignLeft="@+id/linearLayout"
+        android:layout_alignStart="@+id/linearLayout" />
 
 
 </RelativeLayout>

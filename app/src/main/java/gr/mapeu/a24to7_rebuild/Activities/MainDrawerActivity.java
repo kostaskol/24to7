@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -31,7 +32,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import gr.mapeu.a24to7_rebuild.BroadcastReceivers.GpsBroadcastReceiver;
+import gr.mapeu.a24to7_rebuild.BroadcastReceivers.NetworkBroadcastReceiver;
+import gr.mapeu.a24to7_rebuild.Bundles.ProductBundle;
+import gr.mapeu.a24to7_rebuild.Callbacks.GpsChangedListener;
 import gr.mapeu.a24to7_rebuild.Callbacks.ListManagerCallback;
+import gr.mapeu.a24to7_rebuild.Callbacks.NetworkChangedListener;
 import gr.mapeu.a24to7_rebuild.Etc.Constants;
 import gr.mapeu.a24to7_rebuild.Managers.ListManager;
 import gr.mapeu.a24to7_rebuild.R;
@@ -40,7 +46,7 @@ import gr.mapeu.a24to7_rebuild.Services.GpsSender;
 
 public class MainDrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        ListManagerCallback {
+        ListManagerCallback, NetworkChangedListener, GpsChangedListener {
 
     private String[] credentials = new String[2];
     private String key;
@@ -48,8 +54,10 @@ public class MainDrawerActivity extends AppCompatActivity
     private SharedPreferences sharedPreferences;
 
     private boolean shiftStarted;
+    private boolean serviceStarted;
 
-    private PowerManager.WakeLock mWakeLock;
+    private GpsBroadcastReceiver gpsReceiver;
+    private NetworkBroadcastReceiver networkReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +85,29 @@ public class MainDrawerActivity extends AppCompatActivity
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(relog,
                 new IntentFilter("relog"));
+
         int interval = sharedPreferences.getInt(Constants.PREF_INTERVAL, 30);
         Log.d("MainDrawer", "New interval is: " + interval);
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        networkReceiver = new NetworkBroadcastReceiver(this);
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkReceiver, filter);
+
+        gpsReceiver = new GpsBroadcastReceiver(this);
+        filter = new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION);
+        registerReceiver(gpsReceiver, filter);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        unregisterReceiver(networkReceiver);
+        unregisterReceiver(gpsReceiver);
     }
 
     public void initialize() {
@@ -87,15 +115,12 @@ public class MainDrawerActivity extends AppCompatActivity
 
         // Keep the CPU running (screen will still turn off)
         PowerManager mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "myWakeLock");
+        PowerManager.WakeLock mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "myWakeLock");
         mWakeLock.acquire();
 
         //Get credentials from prefs
         credentials[0] = LoginScreen.sharedPreferences.getString(Constants.PREF_USER, null);
         credentials[1] = LoginScreen.sharedPreferences.getString(Constants.PREF_PASS, null);
-
-        // Check if user has set a custom interval
-        final int interval = sharedPreferences.getInt(Constants.PREF_INTERVAL, 60);
 
         key = sharedPreferences.getString(Constants.PREF_PKEY, null);
         if (key == null) {
@@ -105,8 +130,16 @@ public class MainDrawerActivity extends AppCompatActivity
         }
 
         shiftStarted = sharedPreferences.getBoolean(Constants.PREF_SHIFT_STARTED, false);
+        serviceStarted = sharedPreferences.getBoolean(Constants.PREF_SERVICE_STARTED, false);
 
+        createListeners();
 
+    }
+
+    private void createListeners() {
+
+        // Check if user has set a custom interval
+        final int interval = sharedPreferences.getInt(Constants.PREF_INTERVAL, 60);
 
         final Button getListBtn = (Button) findViewById(R.id.get_list_btn);
 
@@ -124,7 +157,7 @@ public class MainDrawerActivity extends AppCompatActivity
                 ListManager lManager =
                         new ListManager(MainDrawerActivity.this, key, user);
                 lManager.getList();
-            getListBtn.setEnabled(true);
+                getListBtn.setEnabled(true);
             }
         });
 
@@ -151,15 +184,17 @@ public class MainDrawerActivity extends AppCompatActivity
         final Button startShift = (Button) findViewById(R.id.start_end_shift_btn);
 
         if (shiftStarted) {
-            Intent serviceIntent = new Intent(MainDrawerActivity.this, GpsSender.class);
-            serviceIntent
-                    .putExtra(Constants.KEY_EXTRA, key)
-                    .putExtra(Constants.CREDENTIALS_EXTRA, credentials)
-                    .putExtra(Constants.SERVICE_INTERVAL_EXTRA, interval)
-                    .putExtra(Constants.ALL_EXTRAS, "");
+            if (!serviceStarted) {
+                Intent serviceIntent = new Intent(MainDrawerActivity.this, GpsSender.class);
+                serviceIntent
+                        .putExtra(Constants.KEY_EXTRA, key)
+                        .putExtra(Constants.CREDENTIALS_EXTRA, credentials)
+                        .putExtra(Constants.SERVICE_INTERVAL_EXTRA, interval)
+                        .putExtra(Constants.ALL_EXTRAS, "");
 
-            startService(serviceIntent);
-            startShift.setText("ΤΕΛΟΣ ΒΑΡΔΙΑΣ");
+                startService(serviceIntent);
+                startShift.setText("ΤΕΛΟΣ ΒΑΡΔΙΑΣ");
+            }
         } else {
             startShift.setText("ΑΡΧΗ ΒΑΡΔΙΑΣ");
         }
@@ -170,7 +205,7 @@ public class MainDrawerActivity extends AppCompatActivity
                 startShift.setEnabled(false);
                 if (!shiftStarted) {
                     shiftStarted = true;
-
+                    serviceStarted = true;
                     Intent serviceIntent = new Intent(MainDrawerActivity.this, GpsSender.class);
                     serviceIntent
                             .putExtra(Constants.KEY_EXTRA, key)
@@ -184,6 +219,7 @@ public class MainDrawerActivity extends AppCompatActivity
 
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putBoolean(Constants.PREF_SHIFT_STARTED, true);
+                    editor.putBoolean(Constants.PREF_SERVICE_STARTED, true);
                     editor.apply();
 
                     startShift.setText("ΤΕΛΟΣ ΒΑΡΔΙΑΣ");
@@ -191,6 +227,7 @@ public class MainDrawerActivity extends AppCompatActivity
                     shiftStarted = false;
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putBoolean(Constants.PREF_SHIFT_STARTED, false);
+                    editor.putBoolean(Constants.PREF_SERVICE_STARTED, false);
                     editor.apply();
                     startShift.setText("ΑΡΧΗ ΒΑΡΔΙΑΣ");
                     stopSending();
@@ -198,9 +235,18 @@ public class MainDrawerActivity extends AppCompatActivity
                 startShift.setEnabled(true);
             }
         });
+
+        Button deleteDbBtn = (Button) findViewById(R.id.delete_db_btn);
+        deleteDbBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ListManager listManager = new ListManager(MainDrawerActivity.this);
+                listManager.deleteList();
+            }
+        });
     }
 
-    public void logOut() {
+    private void logOut() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(Constants.PREF_USER, null);
         editor.putString(Constants.PREF_PASS, null);
@@ -289,35 +335,6 @@ public class MainDrawerActivity extends AppCompatActivity
         stopService(new Intent(this, GpsSender.class));
     }
 
-    private void checkForNetwork() {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo active = connectivityManager.getActiveNetworkInfo();
-        if (active == null) {
-            showProblemBar(R.id.internet_bar);
-        } else {
-            hideProblemBar(R.id.internet_bar);
-        }
-    }
-
-    protected  void showProblemBar(int ID) {
-        LinearLayout internet = (LinearLayout) findViewById(ID);
-        if (internet.getVisibility() == View.GONE) {
-            Animation in = AnimationUtils.loadAnimation(this, R.anim.problem_alert_in);
-            internet.startAnimation(in);
-            internet.setVisibility(View.VISIBLE);
-        }
-    }
-
-    protected void hideProblemBar(int ID) {
-        LinearLayout internet = (LinearLayout) findViewById(ID);
-        if (internet.getVisibility() == View.VISIBLE) {
-            Animation out = AnimationUtils.loadAnimation(this, R.anim.problem_alert_out);
-            internet.startAnimation(out);
-            internet.setVisibility(View.GONE);
-        }
-    }
-
     @Override
     public void onListAcquiredResponse(int returnCode) {
         switch (returnCode) {
@@ -394,8 +411,45 @@ public class MainDrawerActivity extends AppCompatActivity
         }
     };
 
+    protected  void showProblemBar(int ID) {
+        LinearLayout internet = (LinearLayout) findViewById(ID);
+        if (internet.getVisibility() == View.GONE) {
+            Animation in = AnimationUtils.loadAnimation(this, R.anim.problem_alert_in);
+            internet.startAnimation(in);
+            internet.setVisibility(View.VISIBLE);
+        }
+    }
+
+    protected void hideProblemBar(int ID) {
+        LinearLayout internet = (LinearLayout) findViewById(ID);
+        if (internet.getVisibility() == View.VISIBLE) {
+            Animation out = AnimationUtils.loadAnimation(this, R.anim.problem_alert_out);
+            internet.startAnimation(out);
+            internet.setVisibility(View.GONE);
+        }
+    }
+
     private void relogin() {
+        Log.d("MainDrawer", "Reloging in");
         // TODO: Handle this
     }
 
+    @Override
+    public void onGpsChanged(boolean status) {
+        Log.d("MainDrawer", "Gps Changed");
+        if (!status) {
+            showProblemBar(R.id.gps_bar);
+        } else {
+            hideProblemBar(R.id.gps_bar);
+        }
+    }
+
+    @Override
+    public void onNetworkChanged(boolean status) {
+        if (!status) {
+            showProblemBar(R.id.internet_bar);
+        } else {
+            hideProblemBar(R.id.internet_bar);
+        }
+    }
 }
