@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="send_freq">
+        <item name="5">5</item>
         <item name="30">30</item>
         <item name="60">60</item>
         <item name="120">120</item>

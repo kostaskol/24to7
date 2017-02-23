@@ -30,12 +30,13 @@ public class GpsManager implements GoogleApiClient.ConnectionCallbacks,
 
 
     private LocationRequest mLocationRequest;
-    private GoogleApiClient mGoogleApiClient;
+    final private GoogleApiClient mGoogleApiClient;
     private String latitude;
     private String longitude;
-    private int interval;
-    private Context mContext;
-    private GpsManagerCallback callback;
+    final private int interval;
+    final private Context mContext;
+    final private GpsManagerCallback callback;
+    final private boolean debug;
 
     public GpsManager(int interval, Context context) {
         this.interval = interval;
@@ -46,8 +47,9 @@ public class GpsManager implements GoogleApiClient.ConnectionCallbacks,
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-        createLocationRequest();
-
+        this.debug =
+                context.getSharedPreferences(Constants.MY_PREFS, Context.MODE_PRIVATE)
+                .getBoolean(Constants.PREF_DEBUG, false);
     }
 
     public void start() {
@@ -57,18 +59,19 @@ public class GpsManager implements GoogleApiClient.ConnectionCallbacks,
 
 
     private void createLocationRequest(){
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(interval* Constants.SECONDS)
-                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        Log.d("Gps Manager", "Creating location request");
+        mLocationRequest = LocationRequest.create()
+                .setInterval(interval)
+                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY)
+                .setSmallestDisplacement(0f);
     }
 
     private boolean startLocationUpdates(){
         int permissionCheck = ContextCompat.checkSelfPermission(this.mContext, Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            createLocationRequest();
+
             LocationServices.FusedLocationApi
                     .requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-            Log.d("GPS Manager", "Started location updates");
             return true;
         } else {
             callback.onPermissionNotGranted();
@@ -78,31 +81,29 @@ public class GpsManager implements GoogleApiClient.ConnectionCallbacks,
 
     public void stopLocationUpdates(){
         if(mGoogleApiClient != null){
-            LocationServices.FusedLocationApi
-                    .removeLocationUpdates(mGoogleApiClient, this);
+            if (mGoogleApiClient.isConnected()) {
+                LocationServices.FusedLocationApi
+                        .removeLocationUpdates(mGoogleApiClient, this);
+            } else {
+                if (mGoogleApiClient.isConnecting()) {
+                    mGoogleApiClient.disconnect();
+                }
+            }
         }
     }
 
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.d("Gps Manager", "Connected");
         startLocationUpdates();
     }
 
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(this.mContext, "A connection with the Google Location Services " +
-                "client could not be established. Please try again later.", Toast.LENGTH_LONG).show();
-    }
 
     @Override
     public void onLocationChanged(Location location) {
+        if (debug) {
+            Toast.makeText(mContext, "Location changed", Toast.LENGTH_SHORT).show();
+        }
         latitude = String.valueOf(location.getLatitude());
         longitude = String.valueOf(location.getLongitude());
 
@@ -127,30 +128,22 @@ public class GpsManager implements GoogleApiClient.ConnectionCallbacks,
      * we request their last known location and send that to the server
      */
     public String getLatitude() {
-        if (this.latitude == null) {
-            if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                    PackageManager.PERMISSION_GRANTED) {
-                Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                if (lastLocation == null) {
-                    return null;
-                }
-                this.latitude = String.valueOf(lastLocation.getLatitude());
-            }
-        }
         return this.latitude;
     }
 
     public String getLongitude() {
-        if (this.longitude == null) {
-            if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                    PackageManager.PERMISSION_GRANTED) {
-                Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                if (lastLocation == null) {
-                    return null;
-                }
-                this.longitude = String.valueOf(lastLocation.getLongitude());
-            }
-        }
         return this.longitude;
+    }
+
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(this.mContext, "A connection with the Google Location Services " +
+                "client could not be established. Please try again later.", Toast.LENGTH_LONG).show();
     }
 }

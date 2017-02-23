@@ -61,6 +61,7 @@ public class Constants {
     public static final String PREF_URL = "url";
     public static final String PREF_DEBUG = "pref debug";
     public static final String PREF_SERVICE_STARTED = "service started";
+    public static final String PREF_IP = "ip";
 
     public static final int MIN_INTERVAL = 1000;
 

@@ -97,7 +97,7 @@
         jumboMode="true"
         optimize="true"
         revision="24.0.3"
-        sha1="c5f57c2ba9821fddb78f70b326e87ed5f753df84">
+        sha1="31b5654fe330d1962c9b402faa598c2d817b6eb1">
         <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_66d6f079f66875ba885e158594ac862d4c064d08/classes.dex" />
     </item>
     <item
@@ -142,7 +142,7 @@
         jumboMode="true"
         optimize="true"
         revision="24.0.3"
-        sha1="2ae47c9dff529948de23b510e40d136d0e272255">
+        sha1="e5aa6e71f9d60c3e01227f8eeb4efd9f82e20d8d">
         <dex dex="/home/kostas/workspace/Java/Studio Projects/24to7---Rebuild/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_67f7e94b5ad3f50e33123162102980f807e1b8ac/classes.dex" />
     </item>
     <item

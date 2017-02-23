@@ -31,13 +31,15 @@ public class SoapGpsServiceManager {
         this.keyArr[0] = key;
         this.sharedPreferences =
                 context.getSharedPreferences(Constants.MY_PREFS, Context.MODE_PRIVATE);
+        Log.d("GpsService", "Created");
     }
 
     public void setCallback(GpsSenderResponseHandler callback) {
+        Log.d("GpsService", "Callback set");
         this.callback = callback;
     }
 
-    public void gpsService() {
+    public void call() {
         new AsyncTask<String[], Void, Void>() {
             @Override
             protected void onPreExecute() {
@@ -46,6 +48,7 @@ public class SoapGpsServiceManager {
 
             @Override
             protected Void doInBackground(String[] ... params) {
+                Log.d("GpsService", "Async task called");
                 String[] cred, pos, key;
                 cred = params[0];
                 pos = params[1];

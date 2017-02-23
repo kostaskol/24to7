@@ -84,10 +84,9 @@ public class MainDrawerActivity extends AppCompatActivity
     public void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(relog,
-                new IntentFilter("relog"));
+                new IntentFilter("service"));
 
-        int interval = sharedPreferences.getInt(Constants.PREF_INTERVAL, 30);
-        Log.d("MainDrawer", "New interval is: " + interval);
+        createListeners();
 
     }
 
@@ -109,6 +108,7 @@ public class MainDrawerActivity extends AppCompatActivity
         unregisterReceiver(networkReceiver);
         unregisterReceiver(gpsReceiver);
     }
+
 
     public void initialize() {
         sharedPreferences = getSharedPreferences(Constants.MY_PREFS, MODE_PRIVATE);
@@ -132,7 +132,6 @@ public class MainDrawerActivity extends AppCompatActivity
         shiftStarted = sharedPreferences.getBoolean(Constants.PREF_SHIFT_STARTED, false);
         serviceStarted = sharedPreferences.getBoolean(Constants.PREF_SERVICE_STARTED, false);
 
-        createListeners();
 
     }
 
@@ -184,6 +183,7 @@ public class MainDrawerActivity extends AppCompatActivity
         final Button startShift = (Button) findViewById(R.id.start_end_shift_btn);
 
         if (shiftStarted) {
+            startShift.setText("ΤΕΛΟΣ ΒΑΡΔΙΑΣ");
             if (!serviceStarted) {
                 Intent serviceIntent = new Intent(MainDrawerActivity.this, GpsSender.class);
                 serviceIntent
@@ -193,7 +193,7 @@ public class MainDrawerActivity extends AppCompatActivity
                         .putExtra(Constants.ALL_EXTRAS, "");
 
                 startService(serviceIntent);
-                startShift.setText("ΤΕΛΟΣ ΒΑΡΔΙΑΣ");
+
             }
         } else {
             startShift.setText("ΑΡΧΗ ΒΑΡΔΙΑΣ");
@@ -403,6 +403,7 @@ public class MainDrawerActivity extends AppCompatActivity
     private BroadcastReceiver relog = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d("MainDrawer", "Received");
             if (intent.hasExtra(Constants.RELOG_EXTRA)) {
                 relogin();
             } else {

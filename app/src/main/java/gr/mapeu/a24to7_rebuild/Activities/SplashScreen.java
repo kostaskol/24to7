@@ -52,7 +52,8 @@ public class SplashScreen extends AppCompatActivity {
                     startActivity(intent);
                 } else {*/
                 final EditText urlEdit = new EditText(SplashScreen.this);
-                urlEdit.setText("87.203.78.43:8080");
+                String ip = sharedPreferences.getString(Constants.PREF_IP, "79.130.22.30:8080");
+                urlEdit.setText(ip);
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -73,6 +74,7 @@ public class SplashScreen extends AppCompatActivity {
                         String actualUrl = "http://" + url + "/GPS24-7_Service/GPSService.svc?wsdl";
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString(Constants.PREF_URL, actualUrl);
+                        editor.putString(Constants.PREF_IP, url);
                         editor.apply();
 
                         startActivity(intent);
