@@ -51,6 +51,7 @@ public class SplashScreen extends AppCompatActivity {
                     Log.i("ERROR", "Starting activity");
                     startActivity(intent);
                 } else {*/
+
                 final EditText urlEdit = new EditText(SplashScreen.this);
                 String ip = sharedPreferences.getString(Constants.PREF_IP, "79.130.22.30:8080");
                 urlEdit.setText(ip);
@@ -81,6 +82,17 @@ public class SplashScreen extends AppCompatActivity {
                     }
                 });
                 alert.show();
+
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(SplashScreen.this);
+                alertDialog.setMessage("Debug?");
+                alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        sharedPreferences.edit().putBoolean(Constants.PREF_DEBUG, true).apply();
+                    }
+                });
+                alert.setNegativeButton("NO", null);
+                alertDialog.show();
 
                 //}
             }

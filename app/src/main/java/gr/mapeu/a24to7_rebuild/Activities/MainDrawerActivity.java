@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -140,7 +141,7 @@ public class MainDrawerActivity extends AppCompatActivity
         // Check if user has set a custom interval
         final int interval = sharedPreferences.getInt(Constants.PREF_INTERVAL, 60);
 
-        final Button getListBtn = (Button) findViewById(R.id.get_list_btn);
+        final ImageButton getListBtn = (ImageButton) findViewById(R.id.new_route_btn);
 
         getListBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,7 +161,7 @@ public class MainDrawerActivity extends AppCompatActivity
             }
         });
 
-        final Button newPharm = (Button) findViewById(R.id.new_scan_btn);
+        final ImageButton newPharm = (ImageButton) findViewById(R.id.new_pharm_btn);
 
         newPharm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,10 +181,10 @@ public class MainDrawerActivity extends AppCompatActivity
             }
         });
 
-        final Button startShift = (Button) findViewById(R.id.start_end_shift_btn);
+        final ImageButton startShift = (ImageButton) findViewById(R.id.start_shift_btn);
 
         if (shiftStarted) {
-            startShift.setText("ΤΕΛΟΣ ΒΑΡΔΙΑΣ");
+            startShift.setImageResource(R.drawable.end_shift_icon);
             if (!serviceStarted) {
                 Intent serviceIntent = new Intent(MainDrawerActivity.this, GpsSender.class);
                 serviceIntent
@@ -196,7 +197,7 @@ public class MainDrawerActivity extends AppCompatActivity
 
             }
         } else {
-            startShift.setText("ΑΡΧΗ ΒΑΡΔΙΑΣ");
+            startShift.setImageResource(R.drawable.start_shift_icon);
         }
 
         startShift.setOnClickListener(new View.OnClickListener() {
@@ -222,14 +223,14 @@ public class MainDrawerActivity extends AppCompatActivity
                     editor.putBoolean(Constants.PREF_SERVICE_STARTED, true);
                     editor.apply();
 
-                    startShift.setText("ΤΕΛΟΣ ΒΑΡΔΙΑΣ");
+                    startShift.setImageResource(R.drawable.end_shift_icon);
                 } else {
                     shiftStarted = false;
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putBoolean(Constants.PREF_SHIFT_STARTED, false);
                     editor.putBoolean(Constants.PREF_SERVICE_STARTED, false);
                     editor.apply();
-                    startShift.setText("ΑΡΧΗ ΒΑΡΔΙΑΣ");
+                    startShift.setImageResource(R.drawable.start_shift_icon);
                     stopSending();
                 }
                 startShift.setEnabled(true);
