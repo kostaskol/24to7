@@ -12,9 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
+import com.google.zxing.integration.android.IntentIntegrator;
 
 import gr.mapeu.a24to7_rebuild.Activities.NewPharmacy;
 import gr.mapeu.a24to7_rebuild.Etc.Constants;
@@ -84,6 +87,7 @@ public class FragmentChoosePharm extends Fragment {
                     return;
                 }
 
+
                 editor.putString(Constants.PREF_CURR_PHARM_CODE, currCode);
                 editor.apply();
 
@@ -94,10 +98,22 @@ public class FragmentChoosePharm extends Fragment {
                 transaction.add(R.id.rel_lay_placeholder, NewPharmacy.scanItem);
                 transaction.commit();
                 InputMethodManager inm = (InputMethodManager)
-                                getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inm.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         });
+
+
+        Button scanPharmBtn = (Button) view.findViewById(R.id.scan_pharm_btn);
+
+        scanPharmBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("Choose pharm", "On Click listener");
+                new IntentIntegrator(getActivity()).initiateScan();
+            }
+        });
+
         return view;
     }
 }

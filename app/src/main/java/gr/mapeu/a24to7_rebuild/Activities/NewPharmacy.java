@@ -69,15 +69,11 @@ public class NewPharmacy extends AppCompatActivity implements ListManagerCallbac
                 Toast.makeText(this, "Ακυρώθηκε", Toast.LENGTH_LONG).show();
             } else {
                 Log.d("NewPharm", "Code scanned");
-                String code = result.getContents();
+                String scannedCode = result.getContents();
                 String currCode = sharedPreferences.getString(Constants.PREF_CURR_PHARM_CODE, null);
-                if (currCode == null) {
-                    Log.d("NewPharm", "Null code");
-                    return;
-                }
-                System.out.println("Code: " + code + " pharm: " + currCode);
+                Log.d("NewPharm", "Code scanned: " + scannedCode);
                 DatabaseManager dbManager = new DatabaseManager(this);
-                if (dbManager.scanProd(currCode, code)) {
+                if (dbManager.scanProd(currCode, scannedCode)) {
 
                     Toast.makeText(this, "Το προϊόν σαρώθηκε επιτυχώς",
                             Toast.LENGTH_LONG).show();
@@ -87,17 +83,7 @@ public class NewPharmacy extends AppCompatActivity implements ListManagerCallbac
                     int remainingPharm = dbManager.remainingPharm(currCode);
                     int remainingOverall = dbManager.remainingOverall();
                     scanItem.setTvText(dbManager.remainingPharm(currCode), currCode);
-                    if (remainingOverall == 0) {
-                        Log.d("NewPharm", "Overall complete");
-                        // TODO: Error handling
-                        String key = sharedPreferences.getString(Constants.PREF_PKEY, null);
-                        String user = sharedPreferences.getString(Constants.PREF_USER, null);
-                        SoapNotifyServiceManager sManager =
-                                new SoapNotifyServiceManager(user, key, this);
-                        sManager.call();
-                        Toast.makeText(this, "Όλα τα προϊόντα σαρώθηκαν.",
-                                Toast.LENGTH_LONG).show();
-                    }
+
                     if (remainingPharm == 0) {
                         Log.d("NewPharm", "Pharm complete");
                         //TODO: Do the error handling (no key / user)
@@ -113,6 +99,33 @@ public class NewPharmacy extends AppCompatActivity implements ListManagerCallbac
                                 "φαρμακείο σαρώθηκαν επιτυχώς", Toast.LENGTH_LONG).show();
                         finish();
                     }
+
+                    if (remainingOverall == 0) {
+                        Log.d("NewPharm", "Overall complete");
+                        // TODO: Error handling
+                        String key = sharedPreferences.getString(Constants.PREF_PKEY, null);
+                        String user = sharedPreferences.getString(Constants.PREF_USER, null);
+                        SoapNotifyServiceManager sManager =
+                                new SoapNotifyServiceManager(user, key, this);
+                        sManager.call();
+                        Toast.makeText(this, "Όλα τα προϊόντα σαρώθηκαν.",
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                } else if (dbManager.pharmExists(scannedCode)) {
+                    Toast.makeText(this, "Pharm : " + scannedCode + " exists", Toast.LENGTH_LONG).show();
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(Constants.PREF_CURR_PHARM_CODE, scannedCode);
+                    editor.apply();
+
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+                    transaction.add(R.id.rel_lay_placeholder, scanItem);
+                    transaction.remove(choosePharm);
+                    transaction.commitAllowingStateLoss();;
+                } else {
+                    Log.d("NewPharm", "Unknown code");
                 }
             }
         } else {

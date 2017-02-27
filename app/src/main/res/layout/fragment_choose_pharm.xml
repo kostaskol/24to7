@@ -27,6 +27,15 @@
         android:background="@drawable/circlearrowright"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:text="Scan Pharmacy Code"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="28dp"
+        android:id="@+id/scan_pharm_btn"
+        android:layout_below="@+id/move_to_scan_btn"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
 
 </FrameLayout>
