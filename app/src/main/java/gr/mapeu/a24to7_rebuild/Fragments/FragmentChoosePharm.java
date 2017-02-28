@@ -57,7 +57,37 @@ public class FragmentChoosePharm extends Fragment {
 
                 DatabaseManager manager = new DatabaseManager(getContext());
 
-                if (!manager.pharmExists(currCode)) {
+
+                if (manager.pharmExists(currCode)) {
+                    editor.putString(Constants.PREF_CURR_PHARM_CODE, currCode);
+                    editor.apply();
+
+                    sharedPreferences.edit().putBoolean("STATUS", true).apply();
+                    FragmentManager fragmentManager = getFragmentManager();
+                    FragmentTransaction transaction = fragmentManager.beginTransaction();
+                    transaction.addToBackStack(null);
+                    transaction.remove(FragmentChoosePharm.this);
+                    transaction.add(R.id.rel_lay_placeholder, NewPharmacy.scanItem);
+                    transaction.commit();
+                    InputMethodManager inm = (InputMethodManager)
+                            getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                } else if (manager.pharmExists(currCode.substring(0, currCode.length() - 1)) && currCode.substring(currCode.length() - 1).equals("0")) {
+                    currCode = currCode.substring(0, currCode.length() - 1);
+                    editor.putString(Constants.PREF_CURR_PHARM_CODE, currCode);
+                    editor.apply();
+
+                    sharedPreferences.edit().putBoolean("STATUS", false).apply();
+                    FragmentManager fragmentManager = getFragmentManager();
+                    FragmentTransaction transaction = fragmentManager.beginTransaction();
+                    transaction.addToBackStack(null);
+                    transaction.remove(FragmentChoosePharm.this);
+                    transaction.add(R.id.rel_lay_placeholder, NewPharmacy.scanItem);
+                    transaction.commit();
+                    InputMethodManager inm = (InputMethodManager)
+                            getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                } else if (!manager.pharmExists(currCode)) {
                     String title = "Άγνωστος κωδικός";
                     String message = "Ο κωδικός φαρμακείου που εισάγατε δεν βρέθηκε." +
                             "Αν είστε σίγουρος πως τον πληκτρολογήσατε σωστά και δεν λειτουργεί, " +
@@ -86,25 +116,11 @@ public class FragmentChoosePharm extends Fragment {
                     alert.showDialog();
                     return;
                 }
-
-
-                editor.putString(Constants.PREF_CURR_PHARM_CODE, currCode);
-                editor.apply();
-
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.addToBackStack(null);
-                transaction.remove(FragmentChoosePharm.this);
-                transaction.add(R.id.rel_lay_placeholder, NewPharmacy.scanItem);
-                transaction.commit();
-                InputMethodManager inm = (InputMethodManager)
-                        getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                inm.hideSoftInputFromWindow(view.getWindowToken(), 0);
             }
         });
 
 
-        Button scanPharmBtn = (Button) view.findViewById(R.id.scan_pharm_btn);
+        ImageButton scanPharmBtn = (ImageButton) view.findViewById(R.id.scanPharmButton);
 
         scanPharmBtn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -4,38 +4,53 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="gr.mapeu.a24to7_rebuild.Fragments.FragmentChoosePharm">
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:ems="10"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="110dp"
-        android:id="@+id/pharm_code_edit"
-        android:hint="Κωδικός Φαρμακείου" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"><![CDATA[
 
-    <ImageButton
-        android:contentDescription="@string/moveToPass"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:id="@+id/move_to_scan_btn"
-        android:background="@drawable/circlearrowright"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        " />
 
-    <Button
-        android:text="Scan Pharmacy Code"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="28dp"
-        android:id="@+id/scan_pharm_btn"
-        android:layout_below="@+id/move_to_scan_btn"
-        android:layout_centerHorizontal="true" />
-</RelativeLayout>
+
+
+
+
+        ]]>
+
+        <ImageButton
+            android:contentDescription="@string/moveToPass"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:id="@+id/move_to_scan_btn"
+            android:background="@drawable/circlearrowright"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="49dp" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/pharm_code_edit"
+            android:hint="Κωδικός Φαρμακείου"
+            android:layout_marginBottom="90dp"
+            android:layout_alignBottom="@+id/move_to_scan_btn"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="73dp"
+            android:layout_marginEnd="73dp" />
+
+        <ImageButton
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:background="@drawable/pharmacycode"
+            android:id="@+id/scanPharmButton"
+            android:layout_marginBottom="55dp"
+            android:layout_above="@+id/pharm_code_edit"
+            android:layout_centerHorizontal="true" />
+        " />
+
+    </RelativeLayout>
 
 </FrameLayout>

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -49,7 +50,7 @@ public class FragmentScanItem extends Fragment {
 
         setTvText(rem, currPharmCode);
 
-        Button scanNewProdBtn = (Button) view.findViewById(R.id.scan_new_prod_btn);
+        ImageButton scanNewProdBtn = (ImageButton) view.findViewById(R.id.scanProductButton);
         scanNewProdBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

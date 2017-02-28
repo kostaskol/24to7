@@ -64,6 +64,7 @@ public class NewPharmacy extends AppCompatActivity implements ListManagerCallbac
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         Log.d("Frag", "On Activity Result called");
+
         if (result != null) {
             if (result.getContents() == null) {
                 Toast.makeText(this, "Ακυρώθηκε", Toast.LENGTH_LONG).show();
@@ -89,10 +90,11 @@ public class NewPharmacy extends AppCompatActivity implements ListManagerCallbac
                         //TODO: Do the error handling (no key / user)
                         String key = sharedPreferences.getString(Constants.PREF_PKEY, null);
                         String user = sharedPreferences.getString(Constants.PREF_USER, null);
+                        boolean status = sharedPreferences.getBoolean("Status", Constants.STATUS);
 
                         Log.d("NewPhar", "Calling notify with code: " + currCode);
                         SoapNotifyPharmCompleteManager sManager =
-                                new SoapNotifyPharmCompleteManager(user, key, currCode, this);
+                                new SoapNotifyPharmCompleteManager(user, key, currCode, status, this);
 
                         sManager.call();
                         Toast.makeText(this, "Όλα τα προϊόντα για το συγκεκριμένο " +
@@ -113,6 +115,7 @@ public class NewPharmacy extends AppCompatActivity implements ListManagerCallbac
                     }
 
                 } else if (dbManager.pharmExists(scannedCode)) {
+                    sharedPreferences.edit().putBoolean("STATUS", true).apply();
                     Toast.makeText(this, "Pharm : " + scannedCode + " exists", Toast.LENGTH_LONG).show();
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(Constants.PREF_CURR_PHARM_CODE, scannedCode);
@@ -124,7 +127,23 @@ public class NewPharmacy extends AppCompatActivity implements ListManagerCallbac
                     transaction.add(R.id.rel_lay_placeholder, scanItem);
                     transaction.remove(choosePharm);
                     transaction.commitAllowingStateLoss();;
-                } else {
+                }
+                else if(dbManager.pharmExists(scannedCode.substring(0,scannedCode.length()-1)) && scannedCode.substring(scannedCode.length() - 1).equals("0")){
+                    sharedPreferences.edit().putBoolean("STATUS", false).apply();
+                    scannedCode = scannedCode.substring(0,scannedCode.length()-1);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(Constants.PREF_CURR_PHARM_CODE, scannedCode);
+                    editor.apply();
+
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+                    transaction.add(R.id.rel_lay_placeholder, scanItem);
+                    transaction.remove(choosePharm);
+                    transaction.commitAllowingStateLoss();;
+
+                }
+                else {
                     Log.d("NewPharm", "Unknown code");
                 }
             }

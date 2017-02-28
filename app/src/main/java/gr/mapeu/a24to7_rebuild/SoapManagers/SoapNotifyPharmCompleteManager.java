@@ -16,12 +16,14 @@ public class SoapNotifyPharmCompleteManager {
     private final String user;
     private final String key;
     private final String pharmCode;
+    private final boolean isOpen;
     private final SharedPreferences sharedPreferences;
 
-    public SoapNotifyPharmCompleteManager(String user, String key, String code, Context context) {
+    public SoapNotifyPharmCompleteManager(String user, String key, String code,boolean open, Context context) {
         this.user = user;
         this.key = key;
         this.pharmCode = code;
+        this.isOpen = open;
         this.sharedPreferences =
                 context.getSharedPreferences(Constants.MY_PREFS, Context.MODE_PRIVATE);
     }
@@ -55,6 +57,7 @@ public class SoapNotifyPharmCompleteManager {
                 request.addProperty("UserName", user);
                 request.addProperty("pKey", key);
                 request.addProperty("PharmacyID", pCode);
+                request.addProperty("Status",isOpen);
 
                 SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
                 envelope.dotNet = true;
@@ -63,7 +66,7 @@ public class SoapNotifyPharmCompleteManager {
                 HttpTransportSE transportSE = new HttpTransportSE(url);
                 try {
                     Log.d("NotifyPharm", "Calling with: UserName: " + user + " pKey: " + key +
-                        " Pharm ID: " + pCode);
+                        " Pharm ID: " + pCode + "Status:" + isOpen);
                     transportSE.call(Constants.SOAP_ACTION_NOTIFY_PHARM, envelope);
                 } catch (Exception e) {
                     e.printStackTrace();
