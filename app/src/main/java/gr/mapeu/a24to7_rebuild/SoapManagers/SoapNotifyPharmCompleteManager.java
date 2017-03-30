@@ -16,10 +16,10 @@ public class SoapNotifyPharmCompleteManager {
     private final String user;
     private final String key;
     private final String pharmCode;
-    private final boolean isOpen;
+    private final String isOpen;
     private final SharedPreferences sharedPreferences;
 
-    public SoapNotifyPharmCompleteManager(String user, String key, String code,boolean open, Context context) {
+    public SoapNotifyPharmCompleteManager(String user, String key, String code, String open, Context context) {
         this.user = user;
         this.key = key;
         this.pharmCode = code;
@@ -45,19 +45,23 @@ public class SoapNotifyPharmCompleteManager {
                     return null;
                 }
 
+                int pStatus = -1;
                 int pCode = -1;
                 try {
                     pCode = Integer.parseInt(pharmCode);
+                    pStatus = Integer.parseInt(isOpen);
                 } catch (Exception nfe) {
                     nfe.printStackTrace();
                 }
+
+
 
                 SoapObject request =
                         new SoapObject(Constants.NAMESPACE, Constants.METHOD_NOTIFY_PHARM);
                 request.addProperty("UserName", user);
                 request.addProperty("pKey", key);
                 request.addProperty("PharmacyID", pCode);
-                request.addProperty("Status",isOpen);
+                request.addProperty("PharmacyisOpen",pStatus);
 
                 SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
                 envelope.dotNet = true;
@@ -66,7 +70,7 @@ public class SoapNotifyPharmCompleteManager {
                 HttpTransportSE transportSE = new HttpTransportSE(url);
                 try {
                     Log.d("NotifyPharm", "Calling with: UserName: " + user + " pKey: " + key +
-                        " Pharm ID: " + pCode + "Status:" + isOpen);
+                        " Pharm ID: " + pCode + "PharmacyisOpen:" + isOpen);
                     transportSE.call(Constants.SOAP_ACTION_NOTIFY_PHARM, envelope);
                 } catch (Exception e) {
                     e.printStackTrace();

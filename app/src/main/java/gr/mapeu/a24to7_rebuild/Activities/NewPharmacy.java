@@ -32,9 +32,6 @@ import gr.mapeu.a24to7_rebuild.SoapManagers.SoapNotifyServiceManager;
 
 public class NewPharmacy extends AppCompatActivity implements ListManagerCallback {
 
-    EditText pharmCodeEdit;
-    SharedPreferences prefs;
-    String currCode;
     SharedPreferences sharedPreferences;
     static public FragmentChoosePharm choosePharm;
     static public FragmentScanItem scanItem;
@@ -90,11 +87,11 @@ public class NewPharmacy extends AppCompatActivity implements ListManagerCallbac
                         //TODO: Do the error handling (no key / user)
                         String key = sharedPreferences.getString(Constants.PREF_PKEY, null);
                         String user = sharedPreferences.getString(Constants.PREF_USER, null);
-                        boolean status = sharedPreferences.getBoolean("Status", Constants.STATUS);
+                        String pharmStatus = sharedPreferences.getString(Constants.PREF_STATUS, null);
 
                         Log.d("NewPhar", "Calling notify with code: " + currCode);
                         SoapNotifyPharmCompleteManager sManager =
-                                new SoapNotifyPharmCompleteManager(user, key, currCode, status, this);
+                                new SoapNotifyPharmCompleteManager(user, key, currCode, pharmStatus, this);
 
                         sManager.call();
                         Toast.makeText(this, "Όλα τα προϊόντα για το συγκεκριμένο " +
@@ -115,10 +112,10 @@ public class NewPharmacy extends AppCompatActivity implements ListManagerCallbac
                     }
 
                 } else if (dbManager.pharmExists(scannedCode)) {
-                    sharedPreferences.edit().putBoolean("STATUS", true).apply();
                     Toast.makeText(this, "Pharm : " + scannedCode + " exists", Toast.LENGTH_LONG).show();
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(Constants.PREF_CURR_PHARM_CODE, scannedCode);
+                    editor.putString(Constants.PREF_STATUS, "1");
                     editor.apply();
 
                     FragmentManager fragmentManager = getSupportFragmentManager();
@@ -129,10 +126,10 @@ public class NewPharmacy extends AppCompatActivity implements ListManagerCallbac
                     transaction.commitAllowingStateLoss();;
                 }
                 else if(dbManager.pharmExists(scannedCode.substring(0,scannedCode.length()-1)) && scannedCode.substring(scannedCode.length() - 1).equals("0")){
-                    sharedPreferences.edit().putBoolean("STATUS", false).apply();
                     scannedCode = scannedCode.substring(0,scannedCode.length()-1);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(Constants.PREF_CURR_PHARM_CODE, scannedCode);
+                    editor.putString(Constants.PREF_STATUS, "0");
                     editor.apply();
 
                     FragmentManager fragmentManager = getSupportFragmentManager();

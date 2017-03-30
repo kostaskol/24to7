@@ -60,9 +60,10 @@ public class FragmentChoosePharm extends Fragment {
 
                 if (manager.pharmExists(currCode)) {
                     editor.putString(Constants.PREF_CURR_PHARM_CODE, currCode);
+                    editor.putString(Constants.PREF_STATUS, "1");
                     editor.apply();
 
-                    sharedPreferences.edit().putBoolean("STATUS", true).apply();
+
                     FragmentManager fragmentManager = getFragmentManager();
                     FragmentTransaction transaction = fragmentManager.beginTransaction();
                     transaction.addToBackStack(null);
@@ -75,9 +76,10 @@ public class FragmentChoosePharm extends Fragment {
                 } else if (manager.pharmExists(currCode.substring(0, currCode.length() - 1)) && currCode.substring(currCode.length() - 1).equals("0")) {
                     currCode = currCode.substring(0, currCode.length() - 1);
                     editor.putString(Constants.PREF_CURR_PHARM_CODE, currCode);
+                    editor.putString(Constants.PREF_STATUS, "0");
                     editor.apply();
 
-                    sharedPreferences.edit().putBoolean("STATUS", false).apply();
+
                     FragmentManager fragmentManager = getFragmentManager();
                     FragmentTransaction transaction = fragmentManager.beginTransaction();
                     transaction.addToBackStack(null);

@@ -3,6 +3,24 @@
 
     <item
         is-multidex="true"
+        jar="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\25.2.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="cb454b52545859ed2f24a6c01366805b0fa04b22">
+        <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-animated-vector-drawable-25.2.0_a6d2bfce3fbd3c75667cf8a406fddeb845f74f43\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-tasks\10.2.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="bd75f9f0296fe220da6d0ad961831b04541c4452">
+        <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-tasks-10.2.0_6793963e3afe27aadf8cf4bf596375de2c6fe7f2\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\exploded-aar\com.android.support\multidex\1.0.1\jars\classes.jar"
         jumboMode="true"
         optimize="true"
@@ -16,7 +34,7 @@
         jumboMode="true"
         optimize="true"
         revision="24.0.3"
-        sha1="9f870b3936a3c96d5651a71753cdfe4bb4cc7ad6">
+        sha1="9aa3d1e0a2dcd88d837df029a5c3b54ddaa33b13">
         <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run_39720826b5674bcb1041faa483d2c620968360cf\classes.dex" />
     </item>
     <item
@@ -27,6 +45,15 @@
         revision="24.0.3"
         sha1="67eb33110dbacb46a48175b08ae0c96761d2c17d">
         <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-compat-25.2.0_b88383b74bf6661a668eb0be9b64ebb406e0a2ea\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\libs\ksoap2-android-assembly-2.5.8-jar-with-dependencies.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="d6e6d14301616c866b7eff210ece6579299417ec">
+        <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\2\ksoap2-android-assembly-2.5.8-jar-with-dependencies_7342b65d1c8d3c4c3d02b2b19283f795d6aff966\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -45,6 +72,15 @@
         revision="24.0.3"
         sha1="fa0446a14ed5dd3725047d6399ffea771a564b30">
         <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-support-core-ui-25.2.0_89733ac1542d6e1ebb4b42d0d2173fc87e4779b8\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\25.2.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="702d339bc0a81d21354cd7e2cf2b67225fa4a16c">
+        <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-25.2.0_c225e6991892c2611d58618a8a60406b4990946f\classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -70,7 +106,7 @@
         jumboMode="true"
         optimize="true"
         revision="24.0.3"
-        sha1="fb84672c6823760d15a369374f64ea69d5c7c68b">
+        sha1="c778585e4573f21f8d0e90ef591622a4d52b0c03">
         <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\10\instant-run-bootstrap_74125634590f294c346796b0acd611405cd0b0de\classes.dex" />
     </item>
     <item
@@ -93,51 +129,6 @@
     </item>
     <item
         is-multidex="true"
-        jar="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\exploded-aar\com.android.support\transition\25.2.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="e51c2f662bb72419632af5192553c37e33890a99">
-        <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-transition-25.2.0_c8ed51d17a0cfd1bea6096f346cb7430483213b3\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\25.2.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="cb454b52545859ed2f24a6c01366805b0fa04b22">
-        <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-animated-vector-drawable-25.2.0_a6d2bfce3fbd3c75667cf8a406fddeb845f74f43\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\exploded-aar\com.google.android.gms\play-services-tasks\10.2.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="bd75f9f0296fe220da6d0ad961831b04541c4452">
-        <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-tasks-10.2.0_6793963e3afe27aadf8cf4bf596375de2c6fe7f2\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\libs\ksoap2-android-assembly-2.5.8-jar-with-dependencies.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="d6e6d14301616c866b7eff210ece6579299417ec">
-        <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\2\ksoap2-android-assembly-2.5.8-jar-with-dependencies_7342b65d1c8d3c4c3d02b2b19283f795d6aff966\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
-        jar="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\25.2.0\jars\classes.jar"
-        jumboMode="true"
-        optimize="true"
-        revision="24.0.3"
-        sha1="702d339bc0a81d21354cd7e2cf2b67225fa4a16c">
-        <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-appcompat-v7-25.2.0_c225e6991892c2611d58618a8a60406b4990946f\classes.dex" />
-    </item>
-    <item
-        is-multidex="true"
         jar="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\exploded-aar\com.android.support\support-media-compat\25.2.0\jars\classes.jar"
         jumboMode="true"
         optimize="true"
@@ -153,6 +144,15 @@
         revision="24.0.3"
         sha1="1ac56e5801e986583cbe27f2cce57f626cc7ff93">
         <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.google.android.gms-play-services-basement-10.2.0_bd995b0308b1a7131a3a3f0793616810783613cf\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\exploded-aar\com.android.support\transition\25.2.0\jars\classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="24.0.3"
+        sha1="e51c2f662bb72419632af5192553c37e33890a99">
+        <dex dex="C:\Users\Mihalis\AndroidStudioProjects\24to7---Rebuild\app\build\intermediates\transforms\dex\debug\folders\1000\10\com.android.support-transition-25.2.0_c8ed51d17a0cfd1bea6096f346cb7430483213b3\classes.dex" />
     </item>
     <item
         is-multidex="true"
