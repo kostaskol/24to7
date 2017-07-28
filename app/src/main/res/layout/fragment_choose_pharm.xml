@@ -7,16 +7,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"><![CDATA[
-
-        " />
-
-
-
-
-
-        ]]>
-
+        android:layout_height="match_parent">
         <ImageButton
             android:contentDescription="@string/moveToPass"
             android:layout_width="60dp"
@@ -44,12 +35,11 @@
         <ImageButton
             android:layout_width="128dp"
             android:layout_height="128dp"
-            android:background="@drawable/pharmacycode"
+            android:background="@drawable/pharmacy_code"
             android:id="@+id/scanPharmButton"
             android:layout_marginBottom="55dp"
             android:layout_above="@+id/pharm_code_edit"
             android:layout_centerHorizontal="true" />
-        " />
 
     </RelativeLayout>
 
